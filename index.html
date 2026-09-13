@@ -1084,6 +1084,15 @@
     }
 
     // ===================== GENERATEUR — CONSTRUCTION COMMUNE =====================
+    // Le mégagramme (Mg) n'est jamais utilisé en pratique : on affiche la
+    // tonne (T) à la place, qui désigne exactement la même masse (1 Mg = 1 t).
+    // Ne change que l'affichage — le symbole de préfixe interne ('M') reste
+    // inchangé partout ailleurs (comparaisons, calculs, dataset des cartes).
+    function formaterUnite(symbolePrefixe, grandeur) {
+      if (symbolePrefixe === 'M' && grandeur.symbole === 'g') return 'T';
+      return symbolePrefixe + grandeur.symbole;
+    }
+
     // Assemble l'objet question final à partir d'une grandeur et d'une paire
     // de préfixes déjà choisie. Une seule formule de conversion (section 5.7),
     // partagée par tous les blocs.
@@ -1100,9 +1109,9 @@
         prefixeCible: prefixeCible,
         valeurDepart: valeurDepart,
         valeurCible: valeurCible,
-        uniteDepart: prefixeDepart.symbole + grandeur.symbole,
-        uniteCible: prefixeCible.symbole + grandeur.symbole,
-        enonce: valeurDepart + ' ' + prefixeDepart.symbole + grandeur.symbole
+        uniteDepart: formaterUnite(prefixeDepart.symbole, grandeur),
+        uniteCible: formaterUnite(prefixeCible.symbole, grandeur),
+        enonce: valeurDepart + ' ' + formaterUnite(prefixeDepart.symbole, grandeur)
       };
     }
 
@@ -2649,7 +2658,7 @@
         '  <div class="palette-cartes" id="palette-cartes">' +
         propositions.map(function (symb, idx) {
           return '<div class="carte-glisser" draggable="true" data-symbole="' + symb + '" id="carte-c-' + idx + '">' +
-            symb + q.grandeur.symbole + '</div>';
+            formaterUnite(symb, q.grandeur) + '</div>';
         }).join('') +
         '  </div>' +
         '  <div id="feedback-zone"></div>' +
@@ -2682,7 +2691,7 @@
     function validerReponseGlisserC(q, symboleDepose, cartes, dropzone) {
       const correcte = (symboleDepose === q.prefixeCible.symbole);
 
-      dropzone.textContent = symboleDepose + q.grandeur.symbole;
+      dropzone.textContent = formaterUnite(symboleDepose, q.grandeur);
       dropzone.classList.add(correcte ? 'dropzone-correct' : 'dropzone-incorrect');
 
       cartes.forEach(function (c) {
@@ -2693,8 +2702,8 @@
       finaliserQuestion(
         correcte,
         formatNombre(q.valeurDepart) + ' ' + q.uniteDepart + ' = ' + formatNombre(q.valeurCible) + ' ...',
-        symboleDepose + q.grandeur.symbole,
-        q.prefixeCible.symbole + q.grandeur.symbole,
+        formaterUnite(symboleDepose, q.grandeur),
+        formaterUnite(q.prefixeCible.symbole, q.grandeur),
         document.getElementById('feedback-zone')
       );
     }
@@ -2871,7 +2880,7 @@
         '  <p class="palette-titre">Préfixes</p>' +
         '  <div class="palette-cartes" id="palette-d2-prefixes">' +
         propositionsPrefixe.map(function (symb, idx) {
-          return '<div class="carte-glisser" draggable="true" data-symbole="' + symb + '" id="carte-d2-prefixe-' + idx + '">' + symb + q.grandeur.symbole + '</div>';
+          return '<div class="carte-glisser" draggable="true" data-symbole="' + symb + '" id="carte-d2-prefixe-' + idx + '">' + formaterUnite(symb, q.grandeur) + '</div>';
         }).join('') +
         '  </div>' +
         '  <div id="feedback-zone"></div>' +
@@ -2895,7 +2904,7 @@
           correcte,
           formatNombre(q.valeurDepart) + ' ' + q.uniteDepart + ' = ... ...',
           etat.texteValeur + ' ' + etat.textePrefixe,
-          formatNombre(q.valeurCible) + ' ' + q.prefixeCible.symbole + q.grandeur.symbole,
+          formatNombre(q.valeurCible) + ' ' + formaterUnite(q.prefixeCible.symbole, q.grandeur),
           document.getElementById('feedback-zone')
         );
       }
@@ -2938,12 +2947,12 @@
         if (etat.prefixeRempli) return;
         const symboleDepose = e.dataTransfer.getData('text/plain');
         const correcte = (symboleDepose === q.prefixeCible.symbole);
-        dropzonePrefixe.textContent = symboleDepose + q.grandeur.symbole;
+        dropzonePrefixe.textContent = formaterUnite(symboleDepose, q.grandeur);
         dropzonePrefixe.classList.add(correcte ? 'dropzone-correct' : 'dropzone-incorrect');
         cartesPrefixes.forEach(function (c) { c.setAttribute('draggable', 'false'); c.classList.add('carte-desactivee'); });
         etat.prefixeRempli = true;
         etat.prefixeCorrecte = correcte;
-        etat.textePrefixe = symboleDepose + q.grandeur.symbole;
+        etat.textePrefixe = formaterUnite(symboleDepose, q.grandeur);
         verifierFin();
       });
     }
