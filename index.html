@@ -1,0 +1,3020 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Convertix</title>
+<style>
+
+  /* ===================== VARIABLES CSS — THEME CLAIR (par défaut) ===================== */
+  :root {
+    /* Fonds à 3 niveaux de profondeur */
+    --bg-0: #f4f6f8;
+    --bg-1: #ffffff;
+    --bg-2: #eef1f4;
+
+    /* Textes hiérarchisés */
+    --text-1: #1b1f24;
+    --text-2: #4a5560;
+    --text-3: #7a8593;
+
+    /* Bordures */
+    --border-discrete: #dde2e7;
+    --border-marquee: #b9c2cb;
+
+    /* Palette Okabe-Ito — accent unique par défaut */
+    --accent-bleu: #0072B2;
+    --accent-orange: #E69F00;
+
+    /* Couleurs de feedback (distinctes de la paire Okabe-Ito) */
+    --success-bg: #e5f6ec;
+    --success-border: #1e8e3e;
+    --success-text: #146c2e;
+
+    --danger-bg: #fdecea;
+    --danger-border: #d93025;
+    --danger-text: #a50e0e;
+
+    /* Accent doré — réservé exclusivement à la mise en évidence d'un point clé */
+    --accent-or: #c9a227;
+
+    /* Ombres */
+    --ombre-carte: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --ombre-carte-hover: 0 4px 14px rgba(0, 0, 0, 0.12);
+  }
+
+  /* ===================== THEME SOMBRE ===================== */
+  [data-theme="dark"] {
+    --bg-0: #14181d;
+    --bg-1: #1c2128;
+    --bg-2: #262c34;
+
+    --text-1: #eef1f4;
+    --text-2: #b6bfc9;
+    --text-3: #838d99;
+
+    --border-discrete: #333a42;
+    --border-marquee: #4a545e;
+
+    --accent-bleu: #56b4e9;
+    --accent-orange: #E69F00;
+
+    --success-bg: #163220;
+    --success-border: #2fa257;
+    --success-text: #6fd695;
+
+    --danger-bg: #3a1c1a;
+    --danger-border: #e05c50;
+    --danger-text: #f29a92;
+
+    --accent-or: #d9b64a;
+
+    --ombre-carte: 0 2px 8px rgba(0, 0, 0, 0.35);
+    --ombre-carte-hover: 0 4px 16px rgba(0, 0, 0, 0.45);
+  }
+
+  /* ===================== BASE ===================== */
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    font-family: Verdana, Geneva, sans-serif;
+    background-color: var(--bg-0);
+    color: var(--text-1);
+    min-height: 100vh;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  h1, h2, h3 {
+    font-family: Verdana, Geneva, sans-serif;
+    color: var(--text-1);
+  }
+
+  button {
+    font-family: Verdana, Geneva, sans-serif;
+    cursor: pointer;
+  }
+
+  /* ===================== EN-TÊTE ===================== */
+  header.app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    background-color: var(--bg-1);
+    border-bottom: 1px solid var(--border-discrete);
+  }
+
+  .app-title-bloc {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .app-title {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: var(--accent-bleu);
+    margin: 0;
+  }
+
+  .app-sous-titre {
+    margin: 0;
+    font-size: 0.78rem;
+    font-weight: normal;
+    color: var(--text-2);
+  }
+
+  /* Commutateur de thème */
+  #theme-toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border-marquee);
+    background-color: var(--bg-2);
+    color: var(--text-1);
+    font-size: 0.9rem;
+  }
+
+  #theme-toggle-btn:hover {
+    box-shadow: var(--ombre-carte);
+  }
+
+  #theme-icon {
+    font-size: 1rem;
+  }
+
+  /* ===================== CONTENEUR PRINCIPAL ===================== */
+  main.app-main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+
+  .screen {
+    display: none;
+  }
+
+  .screen.screen-active {
+    display: block;
+  }
+
+  /* ===================== ECRAN ACCUEIL ===================== */
+  .home-intro {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .home-intro p {
+    color: var(--text-2);
+    max-width: 640px;
+    margin: 8px auto 0;
+  }
+
+  .blocks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 20px;
+  }
+
+  .block-card {
+    background-color: var(--bg-1);
+    border: 1px solid var(--border-discrete);
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: var(--ombre-carte);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+  }
+
+  .block-card.block-unlocked {
+    cursor: pointer;
+  }
+
+  .block-card.block-unlocked:hover {
+    box-shadow: var(--ombre-carte-hover);
+    transform: translateY(-2px);
+  }
+
+  .block-card.block-locked {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .block-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .block-icon {
+    font-size: 1.8rem;
+  }
+
+  .block-status-badge {
+    font-size: 0.75rem;
+    padding: 3px 10px;
+    border-radius: 12px;
+    background-color: var(--bg-2);
+    color: var(--text-2);
+    border: 1px solid var(--border-discrete);
+    white-space: nowrap;
+  }
+
+  .block-status-badge.status-unlocked {
+    color: var(--accent-bleu);
+    border-color: var(--accent-bleu);
+  }
+
+  .block-status-badge.status-locked {
+    color: var(--text-3);
+  }
+
+  .block-title {
+    margin: 0;
+    font-size: 1.1rem;
+  }
+
+  .block-description {
+    margin: 0;
+    color: var(--text-2);
+    font-size: 0.88rem;
+    flex-grow: 1;
+  }
+
+  .block-score {
+    font-size: 0.85rem;
+    color: var(--text-2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid var(--border-discrete);
+    padding-top: 10px;
+  }
+
+  .block-stars {
+    color: var(--accent-or);
+    letter-spacing: 1px;
+  }
+
+  /* ===================== ECRAN DE JEU (squelette) ===================== */
+  .game-header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  #game-progress-label {
+    font-weight: bold;
+    color: var(--text-2);
+  }
+
+  #game-score-badge {
+    display: inline-block;
+    min-width: 90px;
+    text-align: left;
+    padding: 6px 12px;
+    border-radius: 10px;
+    background-color: var(--bg-2);
+    border: 1px solid var(--border-discrete);
+    font-size: 0.9rem;
+  }
+
+  #question-container {
+    background-color: var(--bg-1);
+    border: 1px solid var(--border-discrete);
+    border-radius: 14px;
+    padding: 32px;
+    min-height: 260px;
+    box-shadow: var(--ombre-carte);
+  }
+
+  /* ----- Format "conversion directe" ----- */
+  .question-consigne {
+    color: var(--text-2);
+    margin: 0 0 12px;
+  }
+
+  .question-valeur-depart {
+    font-size: 1.8rem;
+    color: var(--accent-bleu);
+    margin: 0 0 8px;
+  }
+
+  .question-cible-imposee {
+    font-size: 1.3rem;
+    color: var(--text-1);
+    margin: 0 0 24px;
+  }
+
+  .question-input-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  #reponse-input {
+    font-family: Verdana, Geneva, sans-serif;
+    font-size: 1.1rem;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border-marquee);
+    background-color: var(--bg-0);
+    color: var(--text-1);
+    width: 160px;
+  }
+
+  #reponse-input:disabled {
+    opacity: 0.7;
+  }
+
+  /* ----- Saisie scientifique (mantisse × 10 exposant) ----- */
+  .input-mantisse, .input-exposant {
+    font-family: Verdana, Geneva, sans-serif;
+    font-size: 1.1rem;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border-marquee);
+    background-color: var(--bg-0);
+    color: var(--text-1);
+  }
+
+  .input-mantisse {
+    width: 110px;
+  }
+
+  .input-exposant {
+    width: 70px;
+  }
+
+  .input-mantisse:disabled, .input-exposant:disabled {
+    opacity: 0.7;
+  }
+
+  .separateur-x10 {
+    font-size: 1.1rem;
+    color: var(--text-1);
+  }
+
+  #valider-btn, #suivant-btn {
+    padding: 10px 18px;
+    border-radius: 10px;
+    border: none;
+    background-color: var(--accent-bleu);
+    color: #ffffff;
+    font-size: 1rem;
+  }
+
+  #valider-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  #feedback-zone {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .feedback {
+    margin: 0;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-weight: bold;
+  }
+
+  .feedback-succes {
+    background-color: var(--success-bg);
+    border: 1px solid var(--success-border);
+    color: var(--success-text);
+  }
+
+  .feedback-erreur {
+    background-color: var(--danger-bg);
+    border: 1px solid var(--danger-border);
+    color: var(--danger-text);
+  }
+
+  .serie-terminee {
+    font-size: 1.2rem;
+    text-align: center;
+    color: var(--text-1);
+  }
+
+  /* ----- Format "QCM coefficient" ----- */
+  .question-qcm .question-consigne {
+    font-size: 1.3rem;
+    color: var(--text-1);
+    margin-bottom: 24px;
+  }
+
+  .qcm-options {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+
+  .qcm-option {
+    padding: 14px 22px;
+    border-radius: 10px;
+    border: 1px solid var(--border-marquee);
+    background-color: var(--bg-2);
+    color: var(--text-1);
+    font-size: 1.1rem;
+    font-family: Verdana, Geneva, sans-serif;
+  }
+
+  .qcm-option:hover:not(:disabled) {
+    box-shadow: var(--ombre-carte-hover);
+  }
+
+  .qcm-option:disabled {
+    cursor: default;
+  }
+
+  .qcm-option.qcm-correct {
+    background-color: var(--success-bg);
+    border-color: var(--success-border);
+    color: var(--success-text);
+  }
+
+  .qcm-option.qcm-incorrect {
+    background-color: var(--danger-bg);
+    border-color: var(--danger-border);
+    color: var(--danger-text);
+  }
+
+  .feedback-exemple {
+    margin: 0;
+    color: var(--text-2);
+    font-size: 0.9rem;
+    font-style: italic;
+    flex-basis: 100%;
+  }
+
+  /* ----- Format "glisser-déposer" (variantes A et B) ----- */
+  .question-glisser .question-consigne {
+    color: var(--text-2);
+    margin: 0 0 20px;
+  }
+
+  .question-equation {
+    font-size: 1.4rem;
+    color: var(--text-1);
+    margin: 0 0 28px;
+  }
+
+  /* Zone à compléter dans une équation (variantes B et C du glisser-déposer) */
+  .equation-dropzone {
+    display: inline-block;
+    min-width: 90px;
+    padding: 4px 14px;
+    margin: 0 4px;
+    border: 2px dashed var(--border-marquee);
+    border-radius: 8px;
+    text-align: center;
+    color: var(--text-2);
+    background-color: var(--bg-2);
+    vertical-align: middle;
+    font-size: 1.1rem;
+  }
+
+  .equation-dropzone.dropzone-hover {
+    border-color: var(--accent-bleu);
+    background-color: var(--bg-0);
+  }
+
+  .equation-dropzone.dropzone-correct {
+    border-style: solid;
+    border-color: var(--success-border);
+    background-color: var(--success-bg);
+    color: var(--success-text);
+  }
+
+  .equation-dropzone.dropzone-incorrect {
+    border-style: solid;
+    border-color: var(--danger-border);
+    background-color: var(--danger-bg);
+    color: var(--danger-text);
+  }
+
+  .dropzone-large {
+    min-height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed var(--border-marquee);
+    border-radius: 12px;
+    margin-bottom: 28px;
+    color: var(--text-2);
+    font-size: 1.1rem;
+    background-color: var(--bg-2);
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+  }
+
+  .dropzone-large.dropzone-hover {
+    border-color: var(--accent-bleu);
+    background-color: var(--bg-0);
+  }
+
+  .dropzone-large.dropzone-correct {
+    border-style: solid;
+    border-color: var(--success-border);
+    background-color: var(--success-bg);
+    color: var(--success-text);
+    font-weight: bold;
+  }
+
+  .dropzone-large.dropzone-incorrect {
+    border-style: solid;
+    border-color: var(--danger-border);
+    background-color: var(--danger-bg);
+    color: var(--danger-text);
+    font-weight: bold;
+  }
+
+  .palette-cartes {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .carte-glisser {
+    padding: 12px 18px;
+    border-radius: 10px;
+    border: 1px solid var(--border-marquee);
+    background-color: var(--bg-1);
+    color: var(--text-1);
+    font-size: 1rem;
+    font-family: Verdana, Geneva, sans-serif;
+    cursor: grab;
+    user-select: none;
+  }
+
+  .carte-glisser:active {
+    cursor: grabbing;
+  }
+
+  .carte-glisser.carte-desactivee {
+    opacity: 0.45;
+    cursor: default;
+  }
+
+  /* ----- Variante D (mix) : deux palettes distinctes ----- */
+  .palette-titre {
+    font-size: 0.85rem;
+    color: var(--text-2);
+    margin: 16px 0 8px;
+  }
+
+  .palette-cartes:first-of-type + .palette-titre {
+    margin-top: 4px;
+  }
+
+  #game-back-btn {
+    margin-top: 20px;
+    padding: 8px 16px;
+    border-radius: 10px;
+    border: 1px solid var(--border-marquee);
+    background-color: var(--bg-2);
+    color: var(--text-1);
+  }
+
+  /* ===================== ECRAN RESULTATS (squelette) ===================== */
+  #results-container {
+    background-color: var(--bg-1);
+    border: 1px solid var(--border-discrete);
+    border-radius: 14px;
+    padding: 32px;
+    box-shadow: var(--ombre-carte);
+  }
+
+  #results-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+
+  #results-actions button {
+    padding: 10px 18px;
+    border-radius: 10px;
+    border: 1px solid var(--border-marquee);
+    background-color: var(--bg-2);
+    color: var(--text-1);
+  }
+
+  #results-actions #results-next-btn {
+    background-color: var(--accent-bleu);
+    border-color: var(--accent-bleu);
+    color: #ffffff;
+  }
+
+  /* ----- Contenu de l'écran de résultats ----- */
+  .resultat-score {
+    font-size: 2rem;
+    color: var(--text-1);
+    margin: 0 0 8px;
+  }
+
+  .resultat-etoiles {
+    font-size: 2rem;
+    color: var(--accent-or);
+    letter-spacing: 4px;
+    margin: 0 0 16px;
+  }
+
+  .resultat-message {
+    font-size: 1.05rem;
+    color: var(--text-2);
+    margin: 0 0 12px;
+  }
+
+  .resultat-deblocage {
+    font-size: 0.95rem;
+    color: var(--accent-bleu);
+    font-weight: bold;
+    margin: 0 0 24px;
+  }
+
+  .tableau-recap-wrapper {
+    overflow-x: auto;
+  }
+
+  .tableau-recap {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+
+  .tableau-recap th, .tableau-recap td {
+    text-align: left;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border-discrete);
+    white-space: nowrap;
+  }
+
+  /* Les 3 dernières colonnes (réponse donnée, réponse correcte, résultat)
+     sont centrées par rapport à leur titre ; seule "Question" reste à gauche. */
+  .tableau-recap th:nth-child(n+2),
+  .tableau-recap td:nth-child(n+2) {
+    text-align: center;
+  }
+
+  .tableau-recap th {
+    color: var(--text-2);
+    font-weight: bold;
+  }
+
+  .tableau-recap td.recap-statut-ok {
+    color: var(--success-text);
+    font-weight: bold;
+  }
+
+  .tableau-recap td.recap-statut-echec {
+    color: var(--danger-text);
+    font-weight: bold;
+  }
+
+  /* ===================== GUIDE D'UTILISATION (modale) ===================== */
+  .guide-lien-btn {
+    margin-top: 16px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid var(--border-marquee);
+    background-color: var(--bg-2);
+    color: var(--text-1);
+    font-size: 0.9rem;
+  }
+
+  .guide-lien-btn:hover {
+    box-shadow: var(--ombre-carte);
+  }
+
+  .guide-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 100;
+  }
+
+  .guide-overlay[hidden] {
+    display: none;
+  }
+
+  .guide-carte {
+    background-color: var(--bg-1);
+    border-radius: 16px;
+    box-shadow: var(--ombre-carte-hover);
+    max-width: 560px;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 24px 28px;
+  }
+
+  .guide-entete {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  .guide-entete h2 {
+    margin: 0;
+    color: var(--accent-bleu);
+    font-size: 1.3rem;
+  }
+
+  .guide-fermer-btn {
+    border: none;
+    background: none;
+    color: var(--text-2);
+    font-size: 1.2rem;
+    padding: 4px 8px;
+    border-radius: 8px;
+    line-height: 1;
+  }
+
+  .guide-fermer-btn:hover {
+    background-color: var(--bg-2);
+    color: var(--text-1);
+  }
+
+  .guide-contenu h3 {
+    color: var(--text-1);
+    font-size: 1rem;
+    margin: 18px 0 6px;
+  }
+
+  .guide-contenu h3:first-child {
+    margin-top: 8px;
+  }
+
+  .guide-contenu p, .guide-contenu li {
+    color: var(--text-2);
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+
+  .guide-contenu ul {
+    margin: 0;
+    padding-left: 20px;
+  }
+
+  .guide-contenu li {
+    margin-bottom: 8px;
+  }
+
+  .guide-contenu li:last-child {
+    margin-bottom: 0;
+  }
+
+  .guide-contenu strong {
+    color: var(--text-1);
+  }
+
+  .guide-danger-btn {
+    margin-top: 4px;
+    padding: 8px 16px;
+    border-radius: 10px;
+    border: 1px solid var(--danger-border);
+    background-color: var(--danger-bg);
+    color: var(--danger-text);
+    font-size: 0.9rem;
+    font-weight: bold;
+  }
+
+  .guide-danger-btn:hover {
+    box-shadow: var(--ombre-carte);
+  }
+
+  .guide-confirmation {
+    margin-top: 8px;
+    color: var(--success-text);
+    font-weight: bold;
+  }
+
+  /* ===================== PIED DE PAGE ===================== */
+  footer.app-footer {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-3);
+    font-size: 0.8rem;
+  }
+
+</style>
+</head>
+<body>
+
+  <header class="app-header">
+    <div class="app-title-bloc">
+      <h1 class="app-title">Convertix</h1>
+      <p class="app-sous-titre">Unités, multiples et puissances de 10</p>
+    </div>
+    <button id="theme-toggle-btn" onclick="setTheme()">
+      <span id="theme-icon">🌙</span>
+      <span id="theme-label">Thème sombre</span>
+    </button>
+  </header>
+
+  <main class="app-main">
+
+    <!-- ===================== ECRAN ACCUEIL ===================== -->
+    <section id="screen-home" class="screen screen-active">
+
+      <div class="home-intro">
+        <h2>Entraîne-toi bloc par bloc</h2>
+        <p>Conversions d'unités avec préfixes (multiples et sous-multiples) et puissances de 10. Commence par le bloc 1 ; les blocs suivants se débloquent au fil de tes progrès (20 questions par série).</p>
+        <button id="guide-ouvrir-btn" class="guide-lien-btn">❓ Comment jouer ?</button>
+      </div>
+
+      <div class="blocks-grid">
+
+        <article class="block-card block-unlocked" id="block-card-1">
+          <div class="block-card-top">
+            <span class="block-icon">🔓</span>
+            <span class="block-status-badge status-unlocked">Débloqué</span>
+          </div>
+          <h3 class="block-title">Bloc 1 — Unités simples, écarts faibles</h3>
+          <p class="block-description">Conversions entre préfixes proches (g, s, m, A, V, W, J...).</p>
+          <div class="block-score">
+            <span id="block-1-score-text">Pas encore joué</span>
+            <span class="block-stars" id="block-1-stars">☆☆☆☆☆</span>
+          </div>
+        </article>
+
+        <article class="block-card block-locked" id="block-card-2">
+          <div class="block-card-top">
+            <span class="block-icon" id="block-2-icon">🔒</span>
+            <span class="block-status-badge status-locked" id="block-2-badge">Verrouillé</span>
+          </div>
+          <h3 class="block-title">Bloc 2 — Unités simples, écarts grands</h3>
+          <p class="block-description">Écarts d'exposant plus importants, préfixes moins courants (nano, giga).</p>
+          <div class="block-score">
+            <span id="block-2-score-text">À débloquer</span>
+            <span class="block-stars" id="block-2-stars">☆☆☆☆☆</span>
+          </div>
+        </article>
+
+        <article class="block-card block-locked" id="block-card-3">
+          <div class="block-card-top">
+            <span class="block-icon" id="block-3-icon">🔒</span>
+            <span class="block-status-badge status-locked" id="block-3-badge">Verrouillé</span>
+          </div>
+          <h3 class="block-title">Bloc 3 — Surfaces et volumes</h3>
+          <p class="block-description">Conversions au carré ou au cube, équivalences L / dm³ / cm³ / mL.</p>
+          <div class="block-score">
+            <span id="block-3-score-text">À débloquer</span>
+            <span class="block-stars" id="block-3-stars">☆☆☆☆☆</span>
+          </div>
+        </article>
+
+        <article class="block-card block-locked" id="block-card-4">
+          <div class="block-card-top">
+            <span class="block-icon" id="block-4-icon">🔒</span>
+            <span class="block-status-badge status-locked" id="block-4-badge">Verrouillé</span>
+          </div>
+          <h3 class="block-title">Bloc 4 — Grandeurs composées</h3>
+          <p class="block-description">Vitesse, accélération, débits, masse volumique, moment, tr/min ↔ tr/s.</p>
+          <div class="block-score">
+            <span id="block-4-score-text">À débloquer</span>
+            <span class="block-stars" id="block-4-stars">☆☆☆☆☆</span>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ===================== ECRAN DE JEU ===================== -->
+    <section id="screen-game" class="screen">
+      <div class="game-header-bar">
+        <span id="game-progress-label">Question 1 / 20</span>
+        <span id="game-score-badge">Score : 0</span>
+      </div>
+
+      <div id="question-container">
+        <!-- Contenu de la question injecté ici, étape ultérieure -->
+      </div>
+
+      <button id="game-back-btn">Retour à l'accueil</button>
+    </section>
+
+    <!-- ===================== ECRAN RESULTATS ===================== -->
+    <section id="screen-results" class="screen">
+      <div id="results-container">
+        <!-- Score, étoiles, tableau récapitulatif injectés ici, étape ultérieure -->
+      </div>
+
+      <div id="results-actions">
+        <button id="results-restart-btn">Recommencer ce bloc</button>
+        <button id="results-home-btn">Retour à l'accueil</button>
+        <button id="results-next-btn" style="display:none;">Bloc suivant</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===================== GUIDE D'UTILISATION (modale) ===================== -->
+  <div id="guide-overlay" class="guide-overlay" hidden>
+    <div class="guide-carte" role="dialog" aria-modal="true" aria-labelledby="guide-titre">
+      <div class="guide-entete">
+        <h2 id="guide-titre">Comment jouer ?</h2>
+        <button id="guide-fermer-btn" class="guide-fermer-btn" aria-label="Fermer">✕</button>
+      </div>
+
+      <div class="guide-contenu">
+        <h3>Le principe</h3>
+        <p>Commence par le bloc 1 (toujours débloqué) : chaque série propose 20 questions de conversion générées aléatoirement. Un bloc supplémentaire se débloque dès que le précédent est réussi avec au moins ★★★★ (4 étoiles sur 5, soit 16/20 ou plus).</p>
+
+        <h3>Les formats de question</h3>
+        <ul>
+          <li><strong>Conversion directe</strong> : tape la réponse dans le champ. Si le résultat comporte beaucoup de zéros, deux champs séparés apparaissent ("mantisse × 10 exposant") pour éviter de les compter un par un.</li>
+          <li><strong>QCM</strong> : choisis la bonne puissance de 10 (ex. × 10³) parmi 4 propositions.</li>
+          <li><strong>Glisser-déposer</strong> : fais glisser la bonne carte (une valeur, une puissance de 10, un préfixe, ou une combinaison des deux) dans la zone en pointillés. La réponse est validée dès le dépôt.</li>
+        </ul>
+
+        <h3>Score et étoiles</h3>
+        <p>À la fin d'une série, sur 20 questions : ★★★★★ à partir de 19/20, ★★★★☆ à partir de 16/20, ★★★☆☆ à partir de 13/20, ★★☆☆☆ à partir de 10/20, ★☆☆☆☆ à partir de 7/20.</p>
+
+        <h3>Sauvegarde</h3>
+        <p>Ta progression (meilleur score, étoiles, blocs débloqués) est enregistrée automatiquement sur cet appareil et ce navigateur — pas de compte à créer. Elle reste donc d'une session à l'autre tant que tu rouvres la page sur le même appareil et le même navigateur, sans vider les données de site.</p>
+
+        <h3>Réinitialiser ma progression</h3>
+        <p>Pour repartir de zéro (par exemple pour un nouvel élève sur le même poste), utilise le bouton ci-dessous. Cette action efface le meilleur score, les étoiles et le déblocage de tous les blocs (le bloc 1 reste toujours débloqué) — elle est irréversible.</p>
+        <button id="guide-reinitialiser-btn" class="guide-danger-btn">🔄 Réinitialiser ma progression</button>
+        <p id="guide-reinitialiser-confirmation" class="guide-confirmation" hidden>Progression réinitialisée.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer class="app-footer">
+    Conçu par JB Cocherel — 2026
+  </footer>
+
+  <script>
+
+    // ===================== GESTION DU THEME =====================
+
+    function setTheme(theme) {
+      const root = document.documentElement;
+
+      if (theme === undefined) {
+        const current = root.getAttribute('data-theme');
+        theme = (current === 'dark') ? 'light' : 'dark';
+      }
+
+      if (theme === 'dark') {
+        root.setAttribute('data-theme', 'dark');
+      } else {
+        root.setAttribute('data-theme', 'light');
+      }
+
+      const icon = document.getElementById('theme-icon');
+      const label = document.getElementById('theme-label');
+      if (theme === 'dark') {
+        icon.textContent = '☀️';
+        label.textContent = 'Thème clair';
+      } else {
+        icon.textContent = '🌙';
+        label.textContent = 'Thème sombre';
+      }
+
+      try {
+        localStorage.setItem('unites-puissances-theme', theme);
+      } catch (e) {
+        // stockage indisponible, thème non persisté pour cette session
+      }
+    }
+
+    (function initTheme() {
+      let saved = null;
+      try {
+        saved = localStorage.getItem('unites-puissances-theme');
+      } catch (e) {
+        saved = null;
+      }
+
+      if (saved === 'dark' || saved === 'light') {
+        setTheme(saved);
+      } else {
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        setTheme(prefersDark ? 'dark' : 'light');
+      }
+    })();
+
+    // ===================== GENERATEUR — DONNEES DE REFERENCE =====================
+
+    // Table des préfixes (section 5.1 de la spec)
+    const PREFIXES = [
+      { symbole: 'G', nom: 'giga',  exposant: 9 },
+      { symbole: 'M', nom: 'méga',  exposant: 6 },
+      { symbole: 'k', nom: 'kilo',  exposant: 3 },
+      { symbole: '',  nom: 'unité de base', exposant: 0 },
+      { symbole: 'd', nom: 'déci',  exposant: -1 },
+      { symbole: 'c', nom: 'centi', exposant: -2 },
+      { symbole: 'm', nom: 'milli', exposant: -3 },
+      { symbole: 'µ', nom: 'micro', exposant: -6 },
+      { symbole: 'n', nom: 'nano',  exposant: -9 }
+    ];
+
+    function getPrefixeParSymbole(symbole) {
+      return PREFIXES.find(function (p) { return p.symbole === symbole; });
+    }
+
+    // Magnitudes d'exposant réellement possibles : écarts entre préfixes de
+    // la table PREFIXES (1, 2, 3, 6, 9) complétées par celles du bloc 3
+    // (surfaces ×2, volumes ×3 : 4, 10, 12) — sert à construire des leurres
+    // plausibles plutôt que des exposants totalement arbitraires. Déclarée
+    // tôt car utilisée par les auto-tests du bloc 4 dès le chargement.
+    const MAGNITUDES_EXPOSANT_POSSIBLES = [1, 2, 3, 4, 6, 9, 10, 12];
+
+    // Table des grandeurs de base utilisables (bloc 1 et 2), avec préfixes usuels
+    // par grandeur (section 5.2) pour éviter les combinaisons absurdes
+    // (ex. "gigaseconde"). Liste à affiner avec l'enseignant (section 10).
+    const GRANDEURS_BASE = [
+      // Préfixes "d" et "c" retirés du gramme : décigramme/centigramme ne
+      // sont pas utilisés en pratique technologique ou scientifique
+      // courante (contrairement à cm pour le mètre, conservé lui).
+      { symbole: 'g',  nom: 'gramme',   prefixesUsuels: ['G', 'M', 'k', '', 'm', 'µ', 'n'] },
+      { symbole: 's',  nom: 'seconde',  prefixesUsuels: ['', 'm', 'µ', 'n'] },
+      // "G" et "M" retirés du mètre : gigamètre/mégamètre ne sont pas des
+      // unités usuelles en STI2D, contrairement à km, dm, cm, mm, µm, nm.
+      { symbole: 'm',  nom: 'mètre',    prefixesUsuels: ['k', '', 'd', 'c', 'm', 'µ', 'n'] },
+      { symbole: 'A',  nom: 'ampère',   prefixesUsuels: ['k', '', 'm', 'µ', 'n'] },
+      // "n" retiré du volt : le nanovolt n'est pas une unité usuelle.
+      { symbole: 'V',  nom: 'volt',     prefixesUsuels: ['k', '', 'm', 'µ'] },
+      { symbole: 'W',  nom: 'watt',     prefixesUsuels: ['G', 'M', 'k', '', 'm', 'µ'] },
+      { symbole: 'J',  nom: 'joule',    prefixesUsuels: ['M', 'k', '', 'm'] },
+      { symbole: 'Ω',  nom: 'ohm',      prefixesUsuels: ['M', 'k', '', 'm'] },
+      { symbole: 'Hz', nom: 'hertz',    prefixesUsuels: ['G', 'M', 'k', ''] },
+      { symbole: 'Pa', nom: 'pascal',   prefixesUsuels: ['M', 'k', ''] },
+      { symbole: 'N',  nom: 'newton',   prefixesUsuels: ['k', '', 'm'] }
+    ];
+
+    // ===================== GENERATEUR — UTILITAIRES =====================
+
+    function choixAleatoire(tableau) {
+      return tableau[Math.floor(Math.random() * tableau.length)];
+    }
+
+    // Génère une valeur "propre" (1 à 3 chiffres significatifs, pas de
+    // décimale absurde) pour rester lisible côté élève (section 5.3).
+    function genererValeurPropre() {
+      const mantissesPossibles = [
+        1, 1.5, 2, 2.5, 3, 4, 5, 6, 7, 8, 9,
+        12, 15, 20, 25, 30, 40, 50, 60, 75, 80, 90,
+        100, 120, 150, 200, 250, 300, 400, 500, 600, 750, 800, 900
+      ];
+      return choixAleatoire(mantissesPossibles);
+    }
+
+    // ===================== GENERATEUR — CONSTRUCTION COMMUNE =====================
+    // Assemble l'objet question final à partir d'une grandeur et d'une paire
+    // de préfixes déjà choisie. Une seule formule de conversion (section 5.7),
+    // partagée par tous les blocs.
+    function construireQuestion(bloc, grandeur, prefixeDepart, prefixeCible) {
+      const valeurDepart = genererValeurPropre();
+      // valeurCible = valeurDepart * 10^(exposantDepart - exposantCible)
+      const ecartExposant = prefixeDepart.exposant - prefixeCible.exposant;
+      const valeurCible = valeurDepart * Math.pow(10, ecartExposant);
+
+      return {
+        bloc: bloc,
+        grandeur: grandeur,
+        prefixeDepart: prefixeDepart,
+        prefixeCible: prefixeCible,
+        valeurDepart: valeurDepart,
+        valeurCible: valeurCible,
+        uniteDepart: prefixeDepart.symbole + grandeur.symbole,
+        uniteCible: prefixeCible.symbole + grandeur.symbole,
+        enonce: valeurDepart + ' ' + prefixeDepart.symbole + grandeur.symbole
+      };
+    }
+
+    // Construit toutes les paires (départ, cible) d'une grandeur dont l'écart
+    // d'exposant absolu tombe dans [ecartMin, ecartMax].
+    function pairesPrefixesDansPlage(grandeur, ecartMin, ecartMax) {
+      const prefixesGrandeur = grandeur.prefixesUsuels.map(getPrefixeParSymbole);
+      const paires = [];
+      for (let i = 0; i < prefixesGrandeur.length; i++) {
+        for (let j = 0; j < prefixesGrandeur.length; j++) {
+          if (i === j) continue;
+          const ecart = Math.abs(prefixesGrandeur[i].exposant - prefixesGrandeur[j].exposant);
+          if (ecart >= ecartMin && ecart <= ecartMax) {
+            paires.push([prefixesGrandeur[i], prefixesGrandeur[j]]);
+          }
+        }
+      }
+      return paires;
+    }
+
+    // ===================== GENERATEUR — BLOC 1 (écarts faibles) =====================
+
+    // Bloc 1 : écart d'exposant entre préfixe de départ et préfixe cible
+    // toujours <= 3 en valeur absolue, préfixe de départ != préfixe cible.
+    function genererQuestionBloc1() {
+      const grandeur = choixAleatoire(GRANDEURS_BASE);
+      const pairesValides = pairesPrefixesDansPlage(grandeur, 1, 3);
+
+      if (pairesValides.length === 0) {
+        // Sécurité : ne devrait pas arriver avec les tables actuelles, mais
+        // on relance sur une autre grandeur plutôt que de planter.
+        return genererQuestionBloc1();
+      }
+
+      const [prefixeDepart, prefixeCible] = choixAleatoire(pairesValides);
+      return construireQuestion(1, grandeur, prefixeDepart, prefixeCible);
+    }
+
+    // ===================== GENERATEUR — BLOC 2 (écarts grands) =====================
+
+    // Bloc 2 (section 5.4) : écart d'exposant > 3, plafonné à 9 pour rester
+    // pédagogiquement raisonnable (évite les cas extrêmes type giga → nano).
+    // Les préfixes moins courants (µ, n, G) sont favorisés par pondération.
+    const PREFIXES_RARES_FAVORISES_BLOC2 = ['µ', 'n', 'G'];
+
+    function genererQuestionBloc2() {
+      const grandeur = choixAleatoire(GRANDEURS_BASE);
+      const pairesValides = pairesPrefixesDansPlage(grandeur, 4, 9);
+
+      if (pairesValides.length === 0) {
+        // Sécurité : ne devrait pas arriver avec les tables actuelles, mais
+        // on relance sur une autre grandeur plutôt que de planter.
+        return genererQuestionBloc2();
+      }
+
+      // Pondération simple : les paires impliquant un préfixe rare comptent
+      // double dans le tirage, sans exclure les autres paires valides.
+      const pairesPonderees = [];
+      pairesValides.forEach(function (paire) {
+        pairesPonderees.push(paire);
+        const contientPrefixeRare = paire.some(function (p) {
+          return PREFIXES_RARES_FAVORISES_BLOC2.indexOf(p.symbole) !== -1;
+        });
+        if (contientPrefixeRare) pairesPonderees.push(paire);
+      });
+
+      const [prefixeDepart, prefixeCible] = choixAleatoire(pairesPonderees);
+      return construireQuestion(2, grandeur, prefixeDepart, prefixeCible);
+    }
+
+    // ===================== GENERATEUR — BLOC 3 (surfaces et volumes) =====================
+    // Section 5.5 : conversion de surface (unité de longueur au carré) ou de
+    // volume (unité de longueur au cube), alternance aléatoire. Le facteur
+    // est calculé dynamiquement à partir de l'écart linéaire entre unités,
+    // jamais en dur : 10^(écart × 2) pour une surface, 10^(écart × 3) pour
+    // un volume. Les équivalences fixes (1 L = 1 dm³, 1 mL = 1 cm³) sont un
+    // cas particulier de cette même formule : L et dm³ partagent le même
+    // exposant linéaire, tout comme mL et cm³.
+
+    const UNITES_SURFACE = [
+      { exposantLineaire: 3, symboles: ['km²'] },
+      { exposantLineaire: 0, symboles: ['m²'] },
+      { exposantLineaire: -2, symboles: ['cm²'] },
+      { exposantLineaire: -3, symboles: ['mm²'] }
+    ];
+
+    const UNITES_VOLUME = [
+      { exposantLineaire: 0, symboles: ['m³'] },
+      { exposantLineaire: -1, symboles: ['dm³', 'L'] },
+      { exposantLineaire: -2, symboles: ['cm³', 'mL'] }
+    ];
+
+    function choisirPaireUnitesDistinctes(table) {
+      const i = Math.floor(Math.random() * table.length);
+      let j;
+      do {
+        j = Math.floor(Math.random() * table.length);
+      } while (j === i);
+      return [table[i], table[j]];
+    }
+
+    function genererQuestionBloc3() {
+      const estSurface = Math.random() < 0.5;
+      const table = estSurface ? UNITES_SURFACE : UNITES_VOLUME;
+      const puissance = estSurface ? 2 : 3;
+
+      const [entreeDepart, entreeCible] = choisirPaireUnitesDistinctes(table);
+      const symboleDepart = choixAleatoire(entreeDepart.symboles);
+      const symboleCible = choixAleatoire(entreeCible.symboles);
+
+      const ecartLineaire = entreeDepart.exposantLineaire - entreeCible.exposantLineaire;
+      const exposantConversion = ecartLineaire * puissance;
+
+      const valeurDepart = genererValeurPropre();
+      const valeurCible = valeurDepart * Math.pow(10, exposantConversion);
+
+      // Objet compatible avec les formats direct/QCM/glisser A et B déjà
+      // écrits pour les blocs 1 et 2 : prefixeDepart/prefixeCible ne portent
+      // ici que l'exposant de conversion (symbole vide), sans passer par la
+      // table PREFIXES qui ne s'applique pas aux surfaces/volumes.
+      return {
+        bloc: 3,
+        type: estSurface ? 'surface' : 'volume',
+        grandeur: { symbole: '', nom: estSurface ? 'surface' : 'volume' },
+        prefixeDepart: { symbole: '', nom: '', exposant: exposantConversion },
+        prefixeCible: { symbole: '', nom: '', exposant: 0 },
+        valeurDepart: valeurDepart,
+        valeurCible: valeurCible,
+        uniteDepart: symboleDepart,
+        uniteCible: symboleCible,
+        enonce: valeurDepart + ' ' + symboleDepart
+      };
+    }
+
+    // ===================== GENERATEUR — BLOC 4 (grandeurs composées) =====================
+    // Section 5.6 : grandeur composée = deux grandeurs simples combinées
+    // (ratio ou produit), chacune convertie indépendamment, les deux
+    // facteurs se combinant ensuite pour donner le facteur final — jamais
+    // calculé en bloc. Demande enseignant : les couples d'unités doivent se
+    // rencontrer réellement dans la vie courante, scientifique ou
+    // technologique, quitte à se répéter — donc plus de tirage libre parmi
+    // tous les préfixes valides, mais des couples choisis à la main pour
+    // chaque grandeur composée (ex. masse volumique en kg/m³ ou g/cm³, pas
+    // en kg/cm³ qui n'est jamais utilisé en pratique).
+
+    // Variante "cubique pure" de la table volume (sans les alias L/mL) pour
+    // garder une notation d'inverse simple (cm³ -> cm⁻³) au dénominateur.
+    const UNITES_VOLUME_CUBIQUE = [
+      { exposantLineaire: 0, symboles: ['m³'] },
+      { exposantLineaire: -1, symboles: ['dm³'] },
+      { exposantLineaire: -2, symboles: ['cm³'] }
+    ];
+
+    // Couples de préfixes (départ, cible) réalistes par contexte d'usage —
+    // le sens (lequel est départ/cible) est ensuite tiré au hasard.
+    const PAIRES_LONGUEUR_VITESSE = [['', 'c'], ['', 'm']];   // m/cm, m/mm : vitesses, débits usuels
+    const PAIRES_TEMPS_SIMPLE = [['', 'm']];                  // s/ms : seule sous-unité de temps courante ici (min = cas particulier séparé)
+
+    const TEMPLATES_GRANDEURS_COMPOSEES = [
+      { nom: 'vitesse linéaire', type: 'vitesse-speciale' },
+      { nom: 'accélération linéaire', type: 'ratio-simple', numerateur: { grandeur: 'm', paires: PAIRES_LONGUEUR_VITESSE }, denominateur: { grandeur: 's', paires: PAIRES_TEMPS_SIMPLE, puissance: 2 } },
+      { nom: 'débit massique', type: 'debit-massique-temps' },
+      { nom: 'débit volumique', type: 'debit-m3s-vers-lmin' },
+      { nom: 'masse volumique', type: 'densite' },
+      { nom: 'moment (N·m)', type: 'moment' },
+      { nom: 'vitesse angulaire', type: 'vitesse-angulaire' }
+    ];
+
+    // Transforme un symbole d'unité en sa forme inverse pour un dénominateur
+    // de ratio : 's' -> 's⁻¹', 'cm³' -> 'cm⁻³', 's' au carré -> 's⁻²'.
+    function uniteInverse(symbole, exposantUnitaire) {
+      const base = symbole.replace(/[²³]/g, '');
+      return base + versExposantUnicode(-exposantUnitaire);
+    }
+
+    // Tire un couple dans une liste de paires réalistes, dans un sens
+    // aléatoire (départ <-> cible), et construit la sous-conversion.
+    function genererSousConversionParPaires(grandeurSymbole, listePaires, puissance) {
+      const grandeur = GRANDEURS_BASE.find(function (g) { return g.symbole === grandeurSymbole; });
+      const paire = choixAleatoire(listePaires);
+      const inverser = Math.random() < 0.5;
+      const symboleA = inverser ? paire[1] : paire[0];
+      const symboleB = inverser ? paire[0] : paire[1];
+      const prefixeDepart = getPrefixeParSymbole(symboleA);
+      const prefixeCible = getPrefixeParSymbole(symboleB);
+      const p = puissance || 1;
+      return {
+        symboleDepart: prefixeDepart.symbole + grandeur.symbole,
+        symboleCible: prefixeCible.symbole + grandeur.symbole,
+        exposant: (prefixeDepart.exposant - prefixeCible.exposant) * p,
+        exposantUnitaire: p
+      };
+    }
+
+    function construireQuestionRatioComposee(nomTemplate, numerateur, denominateur) {
+      const uniteDepart = numerateur.symboleDepart + '·' + uniteInverse(denominateur.symboleDepart, denominateur.exposantUnitaire);
+      const uniteCible = numerateur.symboleCible + '·' + uniteInverse(denominateur.symboleCible, denominateur.exposantUnitaire);
+      const exposantConversion = numerateur.exposant - denominateur.exposant;
+      const valeurDepart = genererValeurPropre();
+      const valeurCible = valeurDepart * Math.pow(10, exposantConversion);
+
+      return {
+        bloc: 4,
+        template: nomTemplate,
+        operation: 'ratio',
+        grandeur: { symbole: '', nom: nomTemplate },
+        prefixeDepart: { symbole: '', nom: '', exposant: exposantConversion },
+        prefixeCible: { symbole: '', nom: '', exposant: 0 },
+        exposantNumerateur: numerateur.exposant,
+        exposantDenominateur: denominateur.exposant,
+        valeurDepart: valeurDepart,
+        valeurCible: valeurCible,
+        uniteDepart: uniteDepart,
+        uniteCible: uniteCible,
+        enonce: valeurDepart + ' ' + uniteDepart
+      };
+    }
+
+    // Masse volumique : couples construits directement à partir d'unités de
+    // densité réellement utilisées (kg/m³, g/cm³, g/dm³ = g/L, kg/dm³ =
+    // kg/L) plutôt que masse et volume tirés indépendamment — ce qui
+    // écarterait des absurdités comme kg/cm³.
+    const UNITES_DENSITE = [
+      { prefixeMasse: 'k', volumeSymbole: 'm³' },
+      { prefixeMasse: '', volumeSymbole: 'cm³' },
+      { prefixeMasse: '', volumeSymbole: 'dm³' },
+      { prefixeMasse: 'k', volumeSymbole: 'dm³' }
+    ];
+
+    function genererQuestionMasseVolumique() {
+      const [entreeDepart, entreeCible] = choisirPaireUnitesDistinctes(UNITES_DENSITE);
+      const prefMasseDepart = getPrefixeParSymbole(entreeDepart.prefixeMasse);
+      const prefMasseCible = getPrefixeParSymbole(entreeCible.prefixeMasse);
+      const volumeDepart = UNITES_VOLUME_CUBIQUE.find(function (u) { return u.symboles[0] === entreeDepart.volumeSymbole; });
+      const volumeCible = UNITES_VOLUME_CUBIQUE.find(function (u) { return u.symboles[0] === entreeCible.volumeSymbole; });
+
+      const exposantMasse = prefMasseDepart.exposant - prefMasseCible.exposant;
+      const exposantVolume = (volumeDepart.exposantLineaire - volumeCible.exposantLineaire) * 3;
+      const exposantConversion = exposantMasse - exposantVolume;
+
+      const uniteDepart = prefMasseDepart.symbole + 'g·' + uniteInverse(entreeDepart.volumeSymbole, 3);
+      const uniteCible = prefMasseCible.symbole + 'g·' + uniteInverse(entreeCible.volumeSymbole, 3);
+
+      const valeurDepart = genererValeurPropre();
+      const valeurCible = valeurDepart * Math.pow(10, exposantConversion);
+
+      return {
+        bloc: 4,
+        template: 'masse volumique',
+        operation: 'ratio',
+        grandeur: { symbole: '', nom: 'masse volumique' },
+        prefixeDepart: { symbole: '', nom: '', exposant: exposantConversion },
+        prefixeCible: { symbole: '', nom: '', exposant: 0 },
+        exposantNumerateur: exposantMasse,
+        exposantDenominateur: exposantVolume,
+        valeurDepart: valeurDepart,
+        valeurCible: valeurCible,
+        uniteDepart: uniteDepart,
+        uniteCible: uniteCible,
+        enonce: valeurDepart + ' ' + uniteDepart
+      };
+    }
+
+    // Moment (couple) : couples réalistes N·m, kN·m, N·mm, N·cm — pas de
+    // tirage libre force × longueur qui produirait des unités jamais vues
+    // (ex. mN·mm).
+    const UNITES_MOMENT = [
+      { prefixeForce: '', prefixeLongueur: '' },
+      { prefixeForce: 'k', prefixeLongueur: '' },
+      { prefixeForce: '', prefixeLongueur: 'm' },
+      { prefixeForce: '', prefixeLongueur: 'c' }
+    ];
+
+    function genererQuestionMoment() {
+      const [entreeDepart, entreeCible] = choisirPaireUnitesDistinctes(UNITES_MOMENT);
+      const prefForceDepart = getPrefixeParSymbole(entreeDepart.prefixeForce);
+      const prefForceCible = getPrefixeParSymbole(entreeCible.prefixeForce);
+      const prefLongDepart = getPrefixeParSymbole(entreeDepart.prefixeLongueur);
+      const prefLongCible = getPrefixeParSymbole(entreeCible.prefixeLongueur);
+
+      const exposantForce = prefForceDepart.exposant - prefForceCible.exposant;
+      const exposantLongueur = prefLongDepart.exposant - prefLongCible.exposant;
+      const exposantConversion = exposantForce + exposantLongueur;
+
+      const uniteDepart = prefForceDepart.symbole + 'N·' + prefLongDepart.symbole + 'm';
+      const uniteCible = prefForceCible.symbole + 'N·' + prefLongCible.symbole + 'm';
+
+      const valeurDepart = genererValeurPropre();
+      const valeurCible = valeurDepart * Math.pow(10, exposantConversion);
+
+      return {
+        bloc: 4,
+        template: 'moment (N·m)',
+        operation: 'produit',
+        grandeur: { symbole: '', nom: 'moment' },
+        prefixeDepart: { symbole: '', nom: '', exposant: exposantConversion },
+        prefixeCible: { symbole: '', nom: '', exposant: 0 },
+        exposantNumerateur: exposantForce,
+        exposantDenominateur: exposantLongueur,
+        valeurDepart: valeurDepart,
+        valeurCible: valeurCible,
+        uniteDepart: uniteDepart,
+        uniteCible: uniteCible,
+        enonce: valeurDepart + ' ' + uniteDepart
+      };
+    }
+
+    // Cas particulier tr/min ↔ tr/s (section 5.6) : facteur fixe de 60, donc
+    // non décimal — incompatible avec le mécanisme "× 10ⁿ" du QCM et du
+    // glisser-déposer. Ce type de question est systématiquement forcé au
+    // format "conversion directe" (voir q.formatImpose).
+    // Multiples de 60 pour garantir un résultat entier "propre" quand on
+    // divise (tr/min -> tr/s) : sinon la plupart des mantisses habituelles
+    // donnent un résultat à rallonge (ex. 500/60 = 8,333333333...).
+    const MULTIPLES_60_PROPRES = [60, 120, 180, 240, 300, 360, 420, 480, 540, 600, 660, 720, 780, 840, 900];
+
+    function genererQuestionVitesseAngulaire() {
+      const versSecondes = Math.random() < 0.5;
+      const valeurDepart = versSecondes ? choixAleatoire(MULTIPLES_60_PROPRES) : genererValeurPropre();
+      const uniteDepart = versSecondes ? 'tr/min' : 'tr/s';
+      const uniteCible = versSecondes ? 'tr/s' : 'tr/min';
+      const valeurCible = versSecondes ? valeurDepart / 60 : valeurDepart * 60;
+
+      return {
+        bloc: 4,
+        template: 'vitesse angulaire',
+        nonDecimal: true,
+        formatImpose: 'direct',
+        grandeur: { symbole: '', nom: 'vitesse angulaire' },
+        valeurDepart: valeurDepart,
+        valeurCible: valeurCible,
+        uniteDepart: uniteDepart,
+        uniteCible: uniteCible,
+        enonce: valeurDepart + ' ' + uniteDepart
+      };
+    }
+
+    // Débit volumique m³/s <-> L/min (demande enseignant) : 1 m³/s = 60000
+    // L/min (1000 L par m³, × 60 s par min) — facteur non décimal (le 60 de
+    // la minute), donc même traitement que tr/min <-> tr/s : format direct
+    // imposé, valeurs choisies pour tomber juste. Pour la conversion
+    // L/min -> m³/s (division), on pioche dans une liste de multiples de
+    // 60000 (avec facteurs 2/5 seulement) pour garantir un résultat exact.
+    const LMIN_PROPRES_VERS_M3S = [12, 15, 30, 60, 120, 150, 300, 600, 1200, 1500, 3000, 6000, 12000, 15000, 30000, 60000];
+
+    // Un débit en m³/s reste énorme même à l'échelle industrielle (1 m³/s =
+    // 60000 L/min) : on limite les valeurs de départ à une échelle réaliste
+    // plutôt que d'utiliser toute la palette habituelle (qui va jusqu'à 900).
+    const VALEURS_M3S_PROPRES = [0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 7, 8, 9, 10];
+    const FACTEUR_M3S_VERS_LMIN = 60000;
+
+    function genererQuestionDebitVolumique() {
+      const versLitresParMinute = Math.random() < 0.5;
+      let valeurDepart, uniteDepart, uniteCible, valeurCible;
+
+      if (versLitresParMinute) {
+        valeurDepart = choixAleatoire(VALEURS_M3S_PROPRES);
+        uniteDepart = 'm³/s';
+        uniteCible = 'L/min';
+        valeurCible = valeurDepart * FACTEUR_M3S_VERS_LMIN;
+      } else {
+        valeurDepart = choixAleatoire(LMIN_PROPRES_VERS_M3S);
+        uniteDepart = 'L/min';
+        uniteCible = 'm³/s';
+        valeurCible = valeurDepart / FACTEUR_M3S_VERS_LMIN;
+      }
+
+      return {
+        bloc: 4,
+        template: 'débit volumique',
+        nonDecimal: true,
+        formatImpose: 'direct',
+        grandeur: { symbole: '', nom: 'débit volumique' },
+        valeurDepart: valeurDepart,
+        valeurCible: valeurCible,
+        uniteDepart: uniteDepart,
+        uniteCible: uniteCible,
+        enonce: valeurDepart + ' ' + uniteDepart
+      };
+    }
+
+    // Vitesse km/h <-> m/s et m/min <-> m/s (demande enseignant) : ces deux
+    // unités introduisent des facteurs non décimaux (3,6 pour km/h — 1000 m
+    // par km divisé par 3600 s par h — et 60 pour la minute), incompatibles
+    // avec le mécanisme "× 10ⁿ" du QCM/glisser-déposer, donc toujours en
+    // format direct. m/s <-> mm/s, cm/s restent gérées par la "vitesse
+    // linéaire" décimale existante.
+    //
+    // km/h -> m/s (division par 3,6) : liste de vitesses réalistes qui
+    // tombent exactement rond (multiples de 3,6 km/h -> m/s entier).
+    const KMH_PROPRES_VERS_MS = [3.6, 7.2, 10.8, 14.4, 18, 21.6, 25.2, 28.8, 32.4, 36, 54, 72, 90, 108, 126, 144, 180, 252, 360];
+    // m/s -> km/h (× 3,6, toujours exact car 3,6 = 18/5) : vitesses réalistes
+    // (marche, course, véhicules, trains), pas toute la palette jusqu'à 900.
+    const VALEURS_MS_PROPRES = [0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80];
+
+    function genererQuestionVitesseSpeciale() {
+      const sousType = choixAleatoire(['kmh', 'mmin']);
+      const versMetreSeconde = Math.random() < 0.5;
+      let valeurDepart, uniteDepart, uniteCible, valeurCible;
+
+      if (sousType === 'kmh') {
+        if (versMetreSeconde) {
+          valeurDepart = choixAleatoire(KMH_PROPRES_VERS_MS);
+          uniteDepart = 'km/h';
+          uniteCible = 'm/s';
+          valeurCible = valeurDepart / 3.6;
+        } else {
+          valeurDepart = choixAleatoire(VALEURS_MS_PROPRES);
+          uniteDepart = 'm/s';
+          uniteCible = 'km/h';
+          valeurCible = valeurDepart * 3.6;
+        }
+      } else {
+        if (versMetreSeconde) {
+          valeurDepart = choixAleatoire(MULTIPLES_60_PROPRES);
+          uniteDepart = 'm/min';
+          uniteCible = 'm/s';
+          valeurCible = valeurDepart / 60;
+        } else {
+          valeurDepart = choixAleatoire(VALEURS_MS_PROPRES);
+          uniteDepart = 'm/s';
+          uniteCible = 'm/min';
+          valeurCible = valeurDepart * 60;
+        }
+      }
+
+      return {
+        bloc: 4,
+        template: 'vitesse linéaire',
+        nonDecimal: true,
+        formatImpose: 'direct',
+        grandeur: { symbole: '', nom: 'vitesse' },
+        valeurDepart: valeurDepart,
+        valeurCible: valeurCible,
+        uniteDepart: uniteDepart,
+        uniteCible: uniteCible,
+        enonce: valeurDepart + ' ' + uniteDepart
+      };
+    }
+
+    // Débit massique avec minute ou heure (demande enseignant) : kg/h, g/h,
+    // kg/min, g/min sont des unités très courantes en pratique (industrie,
+    // laboratoire) mais introduisent un facteur non décimal (60 ou 3600),
+    // donc même traitement que km/h — format direct imposé, valeurs qui
+    // tombent rond. L'unité de masse (g ou kg) est tirée une fois et reste
+    // la même des deux côtés ; seule l'unité de temps change.
+    //
+    // .../h -> .../s (division par 3600) : multiples de 3600 ne gardant que
+    // des facteurs 2 et 5 après simplification, pour un résultat exact.
+    const MULTIPLES_3600_PROPRES = [9, 18, 36, 90, 180, 360, 450, 900, 1800, 3600, 7200];
+
+    // Un débit massique en .../s reste très élevé même à quelques unités
+    // (10 kg/s = 36 tonnes/h) : échelle volontairement plus resserrée que
+    // VALEURS_MS_PROPRES (vitesses), qui monterait jusqu'à 80.
+    const VALEURS_DEBIT_MASSIQUE_PROPRES = [0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 7, 8, 9, 10];
+
+    function genererQuestionDebitMassiqueTemps() {
+      const symboleMasse = choixAleatoire(['', 'k']); // '' = g, 'k' = kg
+      const uniteMasse = symboleMasse + 'g';
+      const parHeure = Math.random() < 0.5;
+      const versSeconde = Math.random() < 0.5;
+      let valeurDepart, uniteDepart, uniteCible, valeurCible;
+
+      if (parHeure) {
+        if (versSeconde) {
+          valeurDepart = choixAleatoire(MULTIPLES_3600_PROPRES);
+          uniteDepart = uniteMasse + '/h';
+          uniteCible = uniteMasse + '/s';
+          valeurCible = valeurDepart / 3600;
+        } else {
+          valeurDepart = choixAleatoire(VALEURS_DEBIT_MASSIQUE_PROPRES);
+          uniteDepart = uniteMasse + '/s';
+          uniteCible = uniteMasse + '/h';
+          valeurCible = valeurDepart * 3600;
+        }
+      } else {
+        if (versSeconde) {
+          valeurDepart = choixAleatoire(MULTIPLES_60_PROPRES);
+          uniteDepart = uniteMasse + '/min';
+          uniteCible = uniteMasse + '/s';
+          valeurCible = valeurDepart / 60;
+        } else {
+          valeurDepart = choixAleatoire(VALEURS_DEBIT_MASSIQUE_PROPRES);
+          uniteDepart = uniteMasse + '/s';
+          uniteCible = uniteMasse + '/min';
+          valeurCible = valeurDepart * 60;
+        }
+      }
+
+      return {
+        bloc: 4,
+        template: 'débit massique',
+        nonDecimal: true,
+        formatImpose: 'direct',
+        grandeur: { symbole: '', nom: 'débit massique' },
+        valeurDepart: valeurDepart,
+        valeurCible: valeurCible,
+        uniteDepart: uniteDepart,
+        uniteCible: uniteCible,
+        enonce: valeurDepart + ' ' + uniteDepart
+      };
+    }
+
+    function genererQuestionBloc4() {
+      const template = choixAleatoire(TEMPLATES_GRANDEURS_COMPOSEES);
+
+      if (template.type === 'vitesse-angulaire') return genererQuestionVitesseAngulaire();
+      if (template.type === 'vitesse-speciale') return genererQuestionVitesseSpeciale();
+      if (template.type === 'debit-massique-temps') return genererQuestionDebitMassiqueTemps();
+      if (template.type === 'debit-m3s-vers-lmin') return genererQuestionDebitVolumique();
+      if (template.type === 'densite') return genererQuestionMasseVolumique();
+      if (template.type === 'moment') return genererQuestionMoment();
+
+      const numerateur = genererSousConversionParPaires(template.numerateur.grandeur, template.numerateur.paires, template.numerateur.puissance);
+      const denominateur = genererSousConversionParPaires(template.denominateur.grandeur, template.denominateur.paires, template.denominateur.puissance);
+
+      return construireQuestionRatioComposee(template.nom, numerateur, denominateur);
+    }
+
+    // ===================== GENERATEUR — AUTO-TESTS CONSOLE =====================
+    // Vérification systématique (section 5.7) : générée à chaque chargement de
+    // page, résultats visibles dans la console développeur. Pas d'assertion
+    // bloquante ici, juste des vérifications de cohérence loggées.
+
+    function autoTestBloc(numeroBloc, generateur, ecartMin, ecartMax) {
+      const NB_TESTS = 500;
+      let anomalies = 0;
+
+      for (let i = 0; i < NB_TESTS; i++) {
+        const q = generateur();
+        const ecart = Math.abs(q.prefixeDepart.exposant - q.prefixeCible.exposant);
+
+        const problemes = [];
+        if (q.prefixeDepart.symbole === q.prefixeCible.symbole) {
+          problemes.push('préfixe départ == préfixe cible');
+        }
+        if (ecart < ecartMin || ecart > ecartMax) {
+          problemes.push('écart exposant hors bornes (' + ecart + ')');
+        }
+        if (!isFinite(q.valeurCible) || q.valeurCible <= 0) {
+          problemes.push('valeurCible invalide (' + q.valeurCible + ')');
+        }
+        // Vérification croisée indépendante du calcul de conversion.
+        // Tolérance relative (pas seulement absolue) : sur de grands écarts
+        // (bloc 2, exposants jusqu'à 9), une multiplication suivie d'une
+        // division accumule une infime erreur flottante sans rapport avec
+        // une vraie erreur de formule.
+        const verifCroisee = (q.valeurDepart * Math.pow(10, q.prefixeDepart.exposant))
+          / Math.pow(10, q.prefixeCible.exposant);
+        const toleranceCroisee = 1e-9 + Math.abs(q.valeurCible) * 1e-9;
+        if (Math.abs(verifCroisee - q.valeurCible) > toleranceCroisee) {
+          problemes.push('incohérence calcul croisé');
+        }
+
+        if (problemes.length > 0) {
+          anomalies++;
+          console.warn('Anomalie génération bloc ' + numeroBloc + ' :', problemes.join(', '), q);
+        }
+      }
+
+      console.log(
+        '[Auto-test bloc ' + numeroBloc + '] ' + NB_TESTS + ' questions générées, ' +
+        anomalies + ' anomalie(s) détectée(s).'
+      );
+
+      // Exemple affiché en console pour contrôle visuel manuel
+      const exemple = generateur();
+      console.log(
+        '[Exemple bloc ' + numeroBloc + '] ' + exemple.enonce + ' = ' +
+        exemple.valeurCible + ' ' + exemple.uniteCible
+      );
+    }
+
+    autoTestBloc(1, genererQuestionBloc1, 1, 3);
+    autoTestBloc(2, genererQuestionBloc2, 4, 9);
+
+    (function autoTestBloc3() {
+      const NB_TESTS = 500;
+      let anomalies = 0;
+
+      for (let i = 0; i < NB_TESTS; i++) {
+        const q = genererQuestionBloc3();
+        const puissance = (q.type === 'surface') ? 2 : 3;
+        const exposantAttendu = q.prefixeDepart.exposant;
+
+        const problemes = [];
+        if (q.uniteDepart === q.uniteCible) {
+          problemes.push('unité départ == unité cible');
+        }
+        if (exposantAttendu % puissance !== 0) {
+          problemes.push('exposant non multiple de ' + puissance + ' (' + exposantAttendu + ')');
+        }
+        if (!isFinite(q.valeurCible) || q.valeurCible <= 0) {
+          problemes.push('valeurCible invalide (' + q.valeurCible + ')');
+        }
+        const verifCroisee = q.valeurDepart * Math.pow(10, exposantAttendu);
+        const toleranceCroisee = 1e-9 + Math.abs(q.valeurCible) * 1e-9;
+        if (Math.abs(verifCroisee - q.valeurCible) > toleranceCroisee) {
+          problemes.push('incohérence calcul croisé');
+        }
+
+        if (problemes.length > 0) {
+          anomalies++;
+          console.warn('Anomalie génération bloc 3 :', problemes.join(', '), q);
+        }
+      }
+
+      console.log(
+        '[Auto-test bloc 3] ' + NB_TESTS + ' questions générées, ' +
+        anomalies + ' anomalie(s) détectée(s).'
+      );
+
+      const exemple = genererQuestionBloc3();
+      console.log(
+        '[Exemple bloc 3] ' + exemple.enonce + ' = ' +
+        exemple.valeurCible + ' ' + exemple.uniteCible
+      );
+    })();
+
+    (function autoTestBloc4() {
+      const NB_TESTS = 500;
+      let anomalies = 0;
+
+      for (let i = 0; i < NB_TESTS; i++) {
+        const q = genererQuestionBloc4();
+        const problemes = [];
+
+        if (q.uniteDepart === q.uniteCible) {
+          problemes.push('unité départ == unité cible');
+        }
+        if (!isFinite(q.valeurCible) || q.valeurCible <= 0) {
+          problemes.push('valeurCible invalide (' + q.valeurCible + ')');
+        }
+
+        if (q.nonDecimal) {
+          // tr/min <-> tr/s (facteur 60) et m³/s <-> L/min (facteur 60000) :
+          // pas d'exposant à vérifier ; toujours forcé en format direct
+          // (pas de QCM/glisser, qui reposent sur le mécanisme × 10ⁿ).
+          if (q.formatImpose !== 'direct') {
+            problemes.push('formatImpose manquant pour un cas non décimal');
+          }
+          let facteurAttendu;
+          if (q.uniteDepart === 'tr/min') facteurAttendu = 1 / 60;
+          else if (q.uniteDepart === 'tr/s') facteurAttendu = 60;
+          else if (q.uniteDepart === 'm³/s') facteurAttendu = FACTEUR_M3S_VERS_LMIN;
+          else if (q.uniteDepart === 'L/min') facteurAttendu = 1 / FACTEUR_M3S_VERS_LMIN;
+          else if (q.uniteDepart === 'km/h') facteurAttendu = 1 / 3.6;
+          else if (q.uniteDepart === 'm/min') facteurAttendu = 1 / 60;
+          else if (q.uniteDepart === 'm/s' && q.uniteCible === 'km/h') facteurAttendu = 3.6;
+          else if (q.uniteDepart === 'm/s' && q.uniteCible === 'm/min') facteurAttendu = 60;
+          else if (q.uniteDepart.endsWith('/h')) facteurAttendu = 1 / 3600;
+          else if (q.uniteDepart.endsWith('/min')) facteurAttendu = 1 / 60;
+          else if (q.uniteCible.endsWith('/h')) facteurAttendu = 3600;
+          else if (q.uniteCible.endsWith('/min')) facteurAttendu = 60;
+          if (Math.abs(q.valeurCible - q.valeurDepart * facteurAttendu) > 1e-9 * Math.abs(q.valeurCible)) {
+            problemes.push('incohérence calcul non décimal (' + q.uniteDepart + ' -> ' + q.uniteCible + ')');
+          }
+        } else {
+          const exposantAttendu = (q.operation === 'produit')
+            ? (q.exposantNumerateur + q.exposantDenominateur)
+            : (q.exposantNumerateur - q.exposantDenominateur);
+
+          if (q.prefixeDepart.exposant !== exposantAttendu) {
+            problemes.push('exposant composé incohérent (' + q.prefixeDepart.exposant + ' vs ' + exposantAttendu + ')');
+          }
+          const verifCroisee = q.valeurDepart * Math.pow(10, exposantAttendu);
+          const toleranceCroisee = 1e-9 + Math.abs(q.valeurCible) * 1e-9;
+          if (Math.abs(verifCroisee - q.valeurCible) > toleranceCroisee) {
+            problemes.push('incohérence calcul croisé');
+          }
+          // Vérifie que les leurres "grandeur oubliée" sont bien distincts
+          const donneesQCM = genererPropositionsExposantBloc4(q);
+          if (new Set(donneesQCM.propositions).size !== 4 || donneesQCM.propositions.indexOf(donneesQCM.exposantCorrect) === -1) {
+            problemes.push('propositions QCM invalides');
+          }
+        }
+
+        if (problemes.length > 0) {
+          anomalies++;
+          console.warn('Anomalie génération bloc 4 :', problemes.join(', '), q);
+        }
+      }
+
+      console.log(
+        '[Auto-test bloc 4] ' + NB_TESTS + ' questions générées, ' +
+        anomalies + ' anomalie(s) détectée(s).'
+      );
+
+      const exemple = genererQuestionBloc4();
+      console.log(
+        '[Exemple bloc 4] ' + exemple.enonce + ' = ' +
+        exemple.valeurCible + ' ' + exemple.uniteCible
+      );
+    })();
+
+    // ===================== ECRAN DE JEU — FORMAT "CONVERSION DIRECTE" =====================
+    // Machine à états d'une série (section 3.3) : idle -> answered -> question suivante.
+    // Seul le format direct est branché à cette étape ; QCM et glisser-déposer
+    // suivront (section 9, étapes 4 et 5).
+
+    const NB_QUESTIONS_PAR_SERIE = 20;
+    const TOLERANCE_RELATIVE = 0.005; // 0,5 % pour absorber les arrondis légitimes
+    const EPSILON = 1e-9;
+
+    const etatJeu = {
+      blocActif: null,
+      questions: [],
+      indexActuel: 0,
+      score: 0,
+      reponsesDonnees: []
+    };
+
+    function afficherEcran(nomEcran) {
+      document.querySelectorAll('.screen').forEach(function (el) {
+        el.classList.remove('screen-active');
+      });
+      document.getElementById('screen-' + nomEcran).classList.add('screen-active');
+    }
+
+    // Met en forme un nombre pour l'affichage : arrondi léger pour éviter les
+    // artefacts de virgule flottante, virgule française pour la lecture élève.
+    // Convertit un nombre en chaîne décimale "à plat" (jamais en notation
+    // exponentielle native de JS, qui apparaît sinon automatiquement pour
+    // les très petits nombres comme 1e-9).
+    function versChaineDecimalePlate(n) {
+      if (n === 0) return '0';
+      const absN = Math.abs(n);
+      if (absN >= 1) return n.toString();
+      const ordreGrandeur = Math.floor(Math.log10(absN));
+      const decimales = Math.min(20, -ordreGrandeur + 10);
+      return n.toFixed(decimales).replace(/0+$/, '').replace(/\.$/, '');
+    }
+
+    // Longueur du plus long groupe de zéros consécutifs dans les chiffres
+    // du nombre (signe et virgule ignorés).
+    function compteZerosConsecutifsMax(chaineNombre) {
+      let sansSigne = chaineNombre.replace('-', '');
+      // Le "0" structurel avant la virgule (ex. le premier "0" de "0,0002")
+      // n'est pas un zéro significatif à compter : on l'exclut avant de
+      // chercher les zéros consécutifs après la virgule.
+      const chiffres = sansSigne.startsWith('0.') ? sansSigne.slice(2) : sansSigne.replace('.', '');
+      let max = 0;
+      let courant = 0;
+      for (const c of chiffres) {
+        if (c === '0') {
+          courant++;
+          max = Math.max(max, courant);
+        } else {
+          courant = 0;
+        }
+      }
+      return max;
+    }
+
+    // Écriture scientifique "mantisse × 10ⁿ" pour les nombres à trop de zéros.
+    function formatNombreScientifique(n) {
+      const signe = n < 0 ? '-' : '';
+      const absN = Math.abs(n);
+      let exposant = Math.floor(Math.log10(absN) + 1e-9);
+      let mantisse = parseFloat((absN / Math.pow(10, exposant)).toPrecision(6));
+      // Corrige une éventuelle dérive d'arrondi sur log10 (mantisse hors [1, 10[).
+      if (mantisse >= 10) { mantisse /= 10; exposant++; }
+      if (mantisse < 1) { mantisse *= 10; exposant--; }
+      return signe + mantisse.toString().replace('.', ',') + ' × 10' + versExposantUnicode(exposant);
+    }
+
+    // Seuil : à partir de 3 zéros consécutifs (grand nombre à zéros de fin,
+    // ou petit nombre à zéros après la virgule), on bascule en écriture
+    // scientifique plutôt que d'afficher le nombre "à plat" — abaissé de 4 à
+    // 3 après test réel (ex. 120 mV = 0,00012 kV, gênant à saisir malgré
+    // seulement 3 zéros).
+    const SEUIL_ZEROS_POUR_NOTATION_SCIENTIFIQUE = 3;
+
+    // Un nombre à trop de zéros (bloc 2 notamment, écarts jusqu'à 10⁹) est
+    // pénible et source d'erreur à saisir au clavier chiffre par chiffre :
+    // sert à la fois à l'affichage (formatNombre) et à basculer le format
+    // "conversion directe" vers une saisie en deux champs mantisse/exposant.
+    function necessiteNotationScientifique(n) {
+      if (!isFinite(n) || n === 0) return false;
+      const chaine = versChaineDecimalePlate(parseFloat(n.toPrecision(10)));
+      return compteZerosConsecutifsMax(chaine) >= SEUIL_ZEROS_POUR_NOTATION_SCIENTIFIQUE;
+    }
+
+    function formatNombre(n) {
+      if (!isFinite(n)) return String(n);
+      const arrondi = parseFloat(n.toPrecision(10));
+      if (arrondi === 0) return '0';
+
+      if (necessiteNotationScientifique(arrondi)) {
+        return formatNombreScientifique(arrondi);
+      }
+
+      return versChaineDecimalePlate(arrondi).replace('.', ',');
+    }
+
+    function genererQuestionPourBloc(blocNum) {
+      if (blocNum === 1) return genererQuestionBloc1();
+      if (blocNum === 2) return genererQuestionBloc2();
+      if (blocNum === 3) return genererQuestionBloc3();
+      if (blocNum === 4) return genererQuestionBloc4();
+      throw new Error('Générateur non disponible pour le bloc ' + blocNum);
+    }
+
+    // Répartition pondérée des formats d'exercice (section 4). Cible finale :
+    // 40% direct / 30% QCM / 30% glisser-déposer. Le tirage porte sur les 3
+    // formats, la variante du glisser-déposer se tire séparément.
+    const FORMATS_PONDERES = [
+      { type: 'direct', poids: 40 },
+      { type: 'qcm', poids: 30 },
+      { type: 'glisser', poids: 30 }
+    ];
+
+    // La variante D (mix) est réservée aux blocs 2 à 4 une fois les
+    // mécaniques individuelles A/B/C bien maîtrisées séparément dans le
+    // bloc 1 (section 4.3). La variante C (glisser le préfixe) ne s'applique
+    // ni au bloc 3 (surfaces/volumes) ni au bloc 4 (grandeurs composées) :
+    // ces unités ne se décomposent pas en un simple préfixe isolable comme
+    // le fait la table PREFIXES.
+    function variantesGlisserPourBloc(blocNum) {
+      if (blocNum === 1) return ['A', 'B', 'C'];
+      if (blocNum === 3 || blocNum === 4) return ['A', 'B', 'D'];
+      return ['A', 'B', 'C', 'D'];
+    }
+
+    function tirerFormatExercice() {
+      const total = FORMATS_PONDERES.reduce(function (s, f) { return s + f.poids; }, 0);
+      let tirage = Math.random() * total;
+      for (let i = 0; i < FORMATS_PONDERES.length; i++) {
+        if (tirage < FORMATS_PONDERES[i].poids) return FORMATS_PONDERES[i].type;
+        tirage -= FORMATS_PONDERES[i].poids;
+      }
+      return FORMATS_PONDERES[FORMATS_PONDERES.length - 1].type;
+    }
+
+    function demarrerSerie(blocNum) {
+      etatJeu.blocActif = blocNum;
+      etatJeu.questions = [];
+      for (let i = 0; i < NB_QUESTIONS_PAR_SERIE; i++) {
+        const q = genererQuestionPourBloc(blocNum);
+        // formatImpose (ex. tr/min <-> tr/s, facteur 60 non décimal) prime
+        // sur le tirage pondéré normal : incompatible avec QCM/glisser.
+        q.format = q.formatImpose || tirerFormatExercice();
+        if (q.format === 'glisser') {
+          q.variante = choixAleatoire(variantesGlisserPourBloc(blocNum));
+          if (q.variante === 'D') {
+            // Sous-variante "préfixe + valeur" seulement là où un vrai
+            // préfixe isolable existe (bloc 2) ; sinon "valeur + puissance
+            // de 10", utilisable partout (blocs 2 à 4).
+            q.sousVarianteD = (blocNum === 2) ? choixAleatoire(['D1', 'D2']) : 'D1';
+          }
+        }
+        etatJeu.questions.push(q);
+      }
+      etatJeu.indexActuel = 0;
+      etatJeu.score = 0;
+      etatJeu.reponsesDonnees = [];
+
+      afficherEcran('game');
+      afficherQuestionCourante();
+    }
+
+    function afficherQuestionCourante() {
+      const q = etatJeu.questions[etatJeu.indexActuel];
+      document.getElementById('game-progress-label').textContent =
+        'Question ' + (etatJeu.indexActuel + 1) + ' / ' + etatJeu.questions.length;
+      document.getElementById('game-score-badge').textContent = 'Score : ' + etatJeu.score;
+
+      if (q.format === 'qcm') {
+        renderQuestionQCM(q);
+      } else if (q.format === 'glisser' && q.variante === 'A') {
+        renderGlisserVarianteA(q);
+      } else if (q.format === 'glisser' && q.variante === 'B') {
+        renderGlisserVarianteB(q);
+      } else if (q.format === 'glisser' && q.variante === 'C') {
+        renderGlisserVarianteC(q);
+      } else if (q.format === 'glisser' && q.variante === 'D') {
+        renderGlisserVarianteD(q);
+      } else {
+        renderQuestionDirecte(q);
+      }
+    }
+
+    function renderQuestionDirecte(q) {
+      const container = document.getElementById('question-container');
+      // Quand la réponse attendue comporte trop de zéros (bloc 2 notamment),
+      // la saisie brute est source d'erreur (compter les zéros au clavier) :
+      // on bascule sur une saisie en deux champs "mantisse × 10 exposant",
+      // plus rapide et qui entraîne directement l'écriture scientifique.
+      const saisieScientifique = necessiteNotationScientifique(q.valeurCible);
+
+      const zoneSaisie = saisieScientifique
+        ? '    <input type="text" inputmode="decimal" id="reponse-mantisse" autocomplete="off" placeholder="mantisse" class="input-mantisse">' +
+          '    <span class="separateur-x10">× 10</span>' +
+          '    <input type="text" inputmode="numeric" id="reponse-exposant" autocomplete="off" placeholder="exp." class="input-exposant">'
+        : '    <input type="text" inputmode="decimal" id="reponse-input" autocomplete="off" placeholder="Ta réponse">';
+
+      container.innerHTML =
+        '<div class="question-direct">' +
+        '  <p class="question-consigne">Convertis la valeur suivante :</p>' +
+        '  <p class="question-valeur-depart">' + formatNombre(q.valeurDepart) + ' ' + q.uniteDepart + '</p>' +
+        '  <p class="question-cible-imposee">= ? ' + q.uniteCible + '</p>' +
+        '  <div class="question-input-row">' +
+        zoneSaisie +
+        '    <button id="valider-btn">Valider</button>' +
+        '  </div>' +
+        '  <div id="feedback-zone"></div>' +
+        '</div>';
+
+      document.getElementById('valider-btn').addEventListener('click', validerReponseDirecte);
+
+      const nomChampUnique = 'reponse-' + etatJeu.indexActuel + '-' + Date.now();
+      const champs = saisieScientifique
+        ? [document.getElementById('reponse-mantisse'), document.getElementById('reponse-exposant')]
+        : [document.getElementById('reponse-input')];
+
+      champs.forEach(function (champ, idx) {
+        champ.setAttribute('autocomplete', 'off');
+        champ.setAttribute('name', nomChampUnique + '-' + idx);
+        champ.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            validerReponseDirecte();
+          }
+        });
+      });
+      champs[0].focus();
+    }
+
+    function validerReponseDirecte() {
+      const q = etatJeu.questions[etatJeu.indexActuel];
+      const saisieScientifique = (document.getElementById('reponse-mantisse') !== null);
+
+      let valeurSaisie, texteReponseDonnee;
+
+      if (saisieScientifique) {
+        const champMantisse = document.getElementById('reponse-mantisse');
+        const champExposant = document.getElementById('reponse-exposant');
+        const mantisse = parseFloat(champMantisse.value.trim().replace(',', '.'));
+        const exposant = parseInt(champExposant.value.trim(), 10);
+        valeurSaisie = mantisse * Math.pow(10, exposant);
+        texteReponseDonnee = isNaN(mantisse) || isNaN(exposant)
+          ? (champMantisse.value + ' × 10' + champExposant.value)
+          : champMantisse.value + ' ' + formatPuissanceDix(exposant);
+        champMantisse.disabled = true;
+        champExposant.disabled = true;
+      } else {
+        const input = document.getElementById('reponse-input');
+        const brut = input.value.trim().replace(',', '.');
+        valeurSaisie = parseFloat(brut);
+        texteReponseDonnee = input.value;
+        input.disabled = true;
+      }
+
+      document.getElementById('valider-btn').disabled = true;
+
+      let correcte = false;
+      if (!isNaN(valeurSaisie)) {
+        const attendu = q.valeurCible;
+        const ecartAbsolu = Math.abs(valeurSaisie - attendu);
+        const toleranceAcceptee = EPSILON + Math.abs(attendu) * TOLERANCE_RELATIVE;
+        correcte = ecartAbsolu <= toleranceAcceptee;
+      }
+
+      finaliserQuestion(
+        correcte,
+        formatNombre(q.valeurDepart) + ' ' + q.uniteDepart + ' = ? ' + q.uniteCible,
+        texteReponseDonnee,
+        formatNombre(q.valeurCible) + ' ' + q.uniteCible,
+        document.getElementById('feedback-zone')
+      );
+    }
+
+    // ===================== ECRAN DE JEU — FORMAT "QCM COEFFICIENT" =====================
+    // Section 4.2 : conversion présentée comme un écart de préfixes, 4
+    // propositions "× 10ⁿ" (n positif ou négatif), une seule bonne réponse.
+
+
+    function versExposantUnicode(n) {
+      const map = {
+        '-': '⁻', '0': '⁰', '1': '¹', '2': '²', '3': '³',
+        '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹'
+      };
+      return n.toString().split('').map(function (c) { return map[c] || c; }).join('');
+    }
+
+    function formatPuissanceDix(exposant) {
+      return '× 10' + versExposantUnicode(exposant);
+    }
+
+    function melanger(tableau) {
+      for (let i = tableau.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const tmp = tableau[i];
+        tableau[i] = tableau[j];
+        tableau[j] = tmp;
+      }
+      return tableau;
+    }
+
+    // Calcule l'exposant correct (écart entre préfixe de départ et préfixe
+    // cible — même formule que le format direct, section 5.3, une seule
+    // source de vérité) et 3 leurres plausibles : l'inverse de signe (piège
+    // kilo/milli) et une autre magnitude dans les deux signes. Partagé par
+    // le QCM et les variantes A/B du glisser-déposer.
+    function genererPropositionsExposant(q) {
+      if (q.bloc === 4) return genererPropositionsExposantBloc4(q);
+
+      const exposantCorrect = q.prefixeDepart.exposant - q.prefixeCible.exposant;
+      const magnitudeCorrecte = Math.abs(exposantCorrect);
+      const signeCorrect = Math.sign(exposantCorrect);
+
+      const magnitudesAlternatives = MAGNITUDES_EXPOSANT_POSSIBLES.filter(function (m) {
+        return m !== magnitudeCorrecte;
+      });
+      const magnitudeAlternative = choixAleatoire(magnitudesAlternatives);
+
+      const propositions = melanger([
+        exposantCorrect,
+        -exposantCorrect,
+        signeCorrect * magnitudeAlternative,
+        -signeCorrect * magnitudeAlternative
+      ]);
+
+      return { exposantCorrect: exposantCorrect, propositions: propositions };
+    }
+
+    // Leurres spécifiques au bloc 4 (section 5.6) : le piège identifié dans
+    // la fiche outil consiste à ne convertir qu'une seule des deux grandeurs
+    // (numérateur ou dénominateur) en oubliant l'autre — ces deux erreurs
+    // classiques sont systématiquement proposées comme leurres.
+    function genererPropositionsExposantBloc4(q) {
+      const operation = q.operation || 'ratio';
+      const exposantCorrect = (operation === 'produit')
+        ? (q.exposantNumerateur + q.exposantDenominateur)
+        : (q.exposantNumerateur - q.exposantDenominateur);
+
+      // Le facteur oublié contribue 0 à l'exposant, quelle que soit
+      // l'opération : "dénominateur non converti" laisse exposantNumerateur
+      // seul. Pour "numérateur non converti", le signe dépend de l'opération
+      // (on soustrait un ratio, on additionne un produit).
+      const candidats = [
+        exposantCorrect,
+        q.exposantNumerateur,
+        (operation === 'produit') ? q.exposantDenominateur : -q.exposantDenominateur,
+        -exposantCorrect
+      ];
+
+      const propositions = [];
+      candidats.forEach(function (c) {
+        if (propositions.indexOf(c) === -1) propositions.push(c);
+      });
+
+      // Complète avec la table générique si des pièges coïncident par hasard
+      // (ex. dénominateur déjà à l'exposant 0).
+      while (propositions.length < 4) {
+        const candidat = choixAleatoire([1, -1]) * choixAleatoire(MAGNITUDES_EXPOSANT_POSSIBLES);
+        if (propositions.indexOf(candidat) === -1) propositions.push(candidat);
+      }
+
+      return { exposantCorrect: exposantCorrect, propositions: melanger(propositions) };
+    }
+
+    function renderQuestionQCM(q) {
+      const donnees = genererPropositionsExposant(q);
+      const exposantCorrect = donnees.exposantCorrect;
+      const propositions = donnees.propositions;
+
+      const container = document.getElementById('question-container');
+      container.innerHTML =
+        '<div class="question-qcm">' +
+        '  <p class="question-consigne">Pour passer de ' + q.uniteDepart + ' à ' + q.uniteCible + ', on...</p>' +
+        '  <div class="qcm-options">' +
+        propositions.map(function (exp, idx) {
+          return '<button class="qcm-option" data-exp="' + exp + '" data-idx="' + idx + '">' +
+            formatPuissanceDix(exp) + '</button>';
+        }).join('') +
+        '  </div>' +
+        '  <div id="feedback-zone"></div>' +
+        '</div>';
+
+      const boutons = container.querySelectorAll('.qcm-option');
+      boutons.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          validerReponseQCM(q, exposantCorrect, boutons, btn);
+        });
+      });
+    }
+
+    function validerReponseQCM(q, exposantCorrect, boutons, boutonClique) {
+      const expChoisi = parseInt(boutonClique.dataset.exp, 10);
+      const correcte = (expChoisi === exposantCorrect);
+
+      boutons.forEach(function (b) {
+        b.disabled = true;
+        const exp = parseInt(b.dataset.exp, 10);
+        if (exp === exposantCorrect) {
+          b.classList.add('qcm-correct');
+        } else if (b === boutonClique) {
+          b.classList.add('qcm-incorrect');
+        }
+      });
+
+      // Exemple chiffré concret pour illustrer le coefficient : on montre
+      // l'étape intermédiaire avec la puissance de 10 correcte, puis le
+      // résultat final (demande enseignant).
+      const exempleTexte = formatNombre(q.valeurDepart) + ' ' + q.uniteDepart +
+        ' = ' + formatNombre(q.valeurDepart) + ' ' + formatPuissanceDix(exposantCorrect) + ' ' + q.uniteCible +
+        ' = ' + formatNombre(q.valeurCible) + ' ' + q.uniteCible;
+
+      finaliserQuestion(
+        correcte,
+        'Pour passer de ' + q.uniteDepart + ' à ' + q.uniteCible + ', on...',
+        formatPuissanceDix(expChoisi),
+        formatPuissanceDix(exposantCorrect),
+        document.getElementById('feedback-zone'),
+        exempleTexte
+      );
+    }
+
+    // Finalise une question quel que soit son format : met à jour le score,
+    // enregistre la réponse pour le futur tableau récapitulatif (étape 6),
+    // affiche le feedback et le bouton de passage à la suite.
+    // exempleTexte (optionnel) : illustration chiffrée concrète, utilisée
+    // pour le format QCM qui n'affiche pas de valeur numérique dans l'énoncé.
+    function finaliserQuestion(correcte, enonceTexte, reponseDonneeTexte, reponseAttendueTexte, feedbackZone, exempleTexte) {
+      if (correcte) etatJeu.score++;
+
+      etatJeu.reponsesDonnees.push({
+        enonce: enonceTexte,
+        reponseDonnee: reponseDonneeTexte,
+        reponseAttendue: reponseAttendueTexte,
+        correcte: correcte
+      });
+
+      feedbackZone.innerHTML = correcte
+        ? '<p class="feedback feedback-succes">✓ Correct !</p>'
+        : '<p class="feedback feedback-erreur">✗ Réponse attendue : ' + reponseAttendueTexte + '</p>';
+
+      if (exempleTexte) {
+        feedbackZone.innerHTML += '<p class="feedback-exemple">Exemple : ' + exempleTexte + '</p>';
+      }
+
+      document.getElementById('game-score-badge').textContent = 'Score : ' + etatJeu.score;
+
+      const derniereQuestion = (etatJeu.indexActuel + 1 >= etatJeu.questions.length);
+      const btnSuivant = document.createElement('button');
+      btnSuivant.id = 'suivant-btn';
+      btnSuivant.textContent = derniereQuestion ? 'Voir le résultat' : 'Question suivante';
+      btnSuivant.addEventListener('click', passerQuestionSuivante);
+      feedbackZone.appendChild(btnSuivant);
+    }
+
+    function passerQuestionSuivante() {
+      etatJeu.indexActuel++;
+      if (etatJeu.indexActuel < etatJeu.questions.length) {
+        afficherQuestionCourante();
+      } else {
+        terminerSerie();
+      }
+    }
+
+    // ===================== PROGRESSION, ETOILES ET SAUVEGARDE =====================
+    // Section 6 : score par série, étoiles, déblocage de bloc, localStorage.
+    // Seuls les blocs 1 à 3 ont un générateur pour l'instant (section 9,
+    // étape 7 pour la suite) : le modèle de données couvre déjà les 4 blocs,
+    // mais le bloc 4 n'est pas encore réellement jouable.
+
+    const NB_BLOCS_IMPLEMENTES = 4;
+    const NB_BLOCS_TOTAL = 4;
+    // Déblocage basé sur le nombre d'étoiles (pas le score brut) : plus
+    // lisible pour l'élève, cohérent avec l'affichage ★.
+    const SEUIL_ETOILES_DEBLOCAGE = 4;
+    const CLE_STOCKAGE_PROGRESSION = 'unites-puissances-progression';
+
+    const NB_ETOILES_MAX = 5;
+
+    function etoilesBareme(score) {
+      if (score >= 19) return 5;
+      if (score >= 16) return 4;
+      if (score >= 13) return 3;
+      if (score >= 10) return 2;
+      if (score >= 7) return 1;
+      return 0;
+    }
+
+    function progressionParDefaut() {
+      const p = {};
+      for (let n = 1; n <= NB_BLOCS_TOTAL; n++) {
+        p[n] = { meilleurScore: null, etoiles: 0, debloque: (n === 1) };
+      }
+      return p;
+    }
+
+    function chargerProgression() {
+      const defaut = progressionParDefaut();
+      try {
+        const brut = localStorage.getItem(CLE_STOCKAGE_PROGRESSION);
+        if (!brut) return defaut;
+        const sauvegarde = JSON.parse(brut);
+        for (let n = 1; n <= NB_BLOCS_TOTAL; n++) {
+          if (sauvegarde[n]) Object.assign(defaut[n], sauvegarde[n]);
+        }
+      } catch (e) {
+        // stockage indisponible ou corrompu : on repart de l'état par défaut
+      }
+      defaut[1].debloque = true;
+      return defaut;
+    }
+
+    function sauvegarderProgression() {
+      if (MODE_TEST_TOUS_BLOCS) return; // ne jamais polluer la vraie progression en mode test
+      try {
+        localStorage.setItem(CLE_STOCKAGE_PROGRESSION, JSON.stringify(progression));
+      } catch (e) {
+        // stockage indisponible : la progression ne sera pas conservée
+      }
+    }
+
+    // Mode test : ouvrir le fichier avec "?debloquertout" à la fin de l'URL
+    // (ex. index.html?debloquertout) débloque tous les blocs pour la session
+    // en cours, sans jamais écrire dans le localStorage — la progression
+    // réelle d'un élève n'est jamais affectée par ce mode.
+    const MODE_TEST_TOUS_BLOCS = new URLSearchParams(location.search).has('debloquertout');
+
+    let progression = chargerProgression();
+    if (MODE_TEST_TOUS_BLOCS) {
+      for (let n = 1; n <= NB_BLOCS_TOTAL; n++) {
+        progression[n].debloque = true;
+      }
+    }
+
+    // Met à jour le texte "meilleur score" / étoiles d'une carte de bloc,
+    // si elle expose les ids correspondants (blocs 1 et 2 pour l'instant).
+    function rafraichirScoreEtEtoiles(n) {
+      const texteScore = document.getElementById('block-' + n + '-score-text');
+      const texteEtoiles = document.getElementById('block-' + n + '-stars');
+      if (!texteScore || !texteEtoiles) return;
+
+      const infos = progression[n];
+      texteScore.textContent = (infos.meilleurScore === null)
+        ? 'Pas encore joué'
+        : 'Meilleur score : ' + infos.meilleurScore + ' / 20';
+      texteEtoiles.textContent = '★'.repeat(infos.etoiles) + '☆'.repeat(NB_ETOILES_MAX - infos.etoiles);
+    }
+
+    // Met à jour l'état verrouillé/débloqué visuel d'une carte de bloc (icône,
+    // badge, classes) et branche son clic si le bloc est débloqué ET jouable
+    // (générateur disponible). Un bloc débloqué dans les données mais pas
+    // encore jouable (générateur manquant) reste visuellement neutre plutôt
+    // que de mener à une impasse.
+    function rafraichirEtatDeblocage(n) {
+      const carte = document.getElementById('block-card-' + n);
+      const icone = document.getElementById('block-' + n + '-icon');
+      const badge = document.getElementById('block-' + n + '-badge');
+      if (!carte || !icone || !badge) return;
+
+      const debloque = progression[n].debloque;
+      const jouable = debloque && n <= NB_BLOCS_IMPLEMENTES;
+
+      carte.classList.toggle('block-unlocked', jouable);
+      carte.classList.toggle('block-locked', !jouable);
+      icone.textContent = jouable ? '🔓' : '🔒';
+      badge.textContent = jouable ? 'Débloqué' : 'Verrouillé';
+      badge.classList.toggle('status-unlocked', jouable);
+      badge.classList.toggle('status-locked', !jouable);
+
+      if (jouable && carte.dataset.clicBranche !== 'true') {
+        carte.addEventListener('click', function () { demarrerSerie(n); });
+        carte.dataset.clicBranche = 'true';
+      }
+    }
+
+    // Rafraîchit toutes les cartes de l'accueil dont l'état a pu changer.
+    function rafraichirAccueil() {
+      rafraichirScoreEtEtoiles(1);
+      rafraichirEtatDeblocage(2);
+      rafraichirScoreEtEtoiles(2);
+      rafraichirEtatDeblocage(3);
+      rafraichirScoreEtEtoiles(3);
+      rafraichirEtatDeblocage(4);
+      rafraichirScoreEtEtoiles(4);
+    }
+
+    function terminerSerie() {
+      const blocActif = etatJeu.blocActif;
+      const score = etatJeu.score;
+      const etoilesObtenues = etoilesBareme(score);
+
+      const infosBloc = progression[blocActif];
+      const recordBattu = (infosBloc.meilleurScore === null || score > infosBloc.meilleurScore);
+      if (recordBattu) infosBloc.meilleurScore = score;
+      if (etoilesObtenues > infosBloc.etoiles) infosBloc.etoiles = etoilesObtenues;
+
+      let blocSuivantVientDetreDebloque = false;
+      const blocSuivant = blocActif + 1;
+      if (etoilesObtenues >= SEUIL_ETOILES_DEBLOCAGE && blocSuivant <= NB_BLOCS_TOTAL && !progression[blocSuivant].debloque) {
+        progression[blocSuivant].debloque = true;
+        blocSuivantVientDetreDebloque = true;
+      }
+
+      sauvegarderProgression();
+      rafraichirAccueil();
+
+      afficherEcran('results');
+      afficherResultatsSerie(etoilesObtenues, blocSuivantVientDetreDebloque && blocSuivant <= NB_BLOCS_IMPLEMENTES);
+    }
+
+    function messageEncouragement(score) {
+      if (score >= 19) return 'Excellent ! Conversions maîtrisées.';
+      if (score >= 16) return 'Très bien, encore quelques révisions et ce sera parfait.';
+      if (score >= 13) return 'Pas mal, continue à t\'entraîner sur ce bloc.';
+      if (score >= 10) return 'Sur la bonne voie, encore un peu d\'entraînement.';
+      if (score >= 7) return 'Les bases sont là, mais il faut encore travailler.';
+      return 'Il faut reprendre les bases : retente ta chance !';
+    }
+
+    function afficherResultatsSerie(etoilesObtenues, afficherBoutonBlocSuivant) {
+      const score = etatJeu.score;
+      const total = etatJeu.questions.length;
+
+      const lignesTableau = etatJeu.reponsesDonnees.map(function (r) {
+        const classeStatut = r.correcte ? 'recap-statut-ok' : 'recap-statut-echec';
+        const symboleStatut = r.correcte ? '✓' : '✗';
+        return '<tr>' +
+          '<td>' + r.enonce + '</td>' +
+          '<td>' + r.reponseDonnee + '</td>' +
+          '<td>' + r.reponseAttendue + '</td>' +
+          '<td class="' + classeStatut + '">' + symboleStatut + '</td>' +
+          '</tr>';
+      }).join('');
+
+      document.getElementById('results-container').innerHTML =
+        '<p class="resultat-score">Score : ' + score + ' / ' + total + '</p>' +
+        '<p class="resultat-etoiles">' + '★'.repeat(etoilesObtenues) + '☆'.repeat(NB_ETOILES_MAX - etoilesObtenues) + '</p>' +
+        '<p class="resultat-message">' + messageEncouragement(score) + '</p>' +
+        (afficherBoutonBlocSuivant ? '<p class="resultat-deblocage">🎉 Bloc suivant débloqué !</p>' : '') +
+        '<div class="tableau-recap-wrapper">' +
+        '<table class="tableau-recap">' +
+        '<thead><tr><th>Question</th><th>Ta réponse</th><th>Réponse correcte</th><th>Résultat</th></tr></thead>' +
+        '<tbody>' + lignesTableau + '</tbody>' +
+        '</table>' +
+        '</div>';
+
+      document.getElementById('results-next-btn').style.display = afficherBoutonBlocSuivant ? 'inline-block' : 'none';
+    }
+
+    // ===================== FORMAT "GLISSER-DEPOSER" — VARIANTE A =====================
+    // Section 4.3, variante A : plusieurs cartes-valeurs déjà calculées sont
+    // proposées, l'élève doit glisser la bonne vers l'unique zone de dépôt
+    // (unité cible). Glisser-déposer natif HTML5 (souris), validation
+    // immédiate au dépôt, pas de bouton "Valider" séparé.
+
+    function renderGlisserVarianteA(q) {
+      const donnees = genererPropositionsExposant(q);
+      const exposantCorrect = donnees.exposantCorrect;
+
+      const cartesValeurs = melanger(donnees.propositions.map(function (exp) {
+        return { exp: exp, valeur: q.valeurDepart * Math.pow(10, exp) };
+      }));
+
+      const container = document.getElementById('question-container');
+      container.innerHTML =
+        '<div class="question-glisser">' +
+        '  <p class="question-consigne">Glisse la carte correspondant à <strong>' +
+        formatNombre(q.valeurDepart) + ' ' + q.uniteDepart + '</strong> vers la zone de dépôt.</p>' +
+        '  <div class="dropzone-large" id="dropzone-a">Dépose ici la valeur en ' + q.uniteCible + '</div>' +
+        '  <div class="palette-cartes" id="palette-cartes">' +
+        cartesValeurs.map(function (c, idx) {
+          return '<div class="carte-glisser" draggable="true" data-exp="' + c.exp + '" id="carte-a-' + idx + '">' +
+            formatNombre(c.valeur) + ' ' + q.uniteCible + '</div>';
+        }).join('') +
+        '  </div>' +
+        '  <div id="feedback-zone"></div>' +
+        '</div>';
+
+      const cartes = container.querySelectorAll('.carte-glisser');
+      cartes.forEach(function (carte) {
+        carte.addEventListener('dragstart', function (e) {
+          e.dataTransfer.setData('text/plain', carte.dataset.exp);
+          e.dataTransfer.effectAllowed = 'move';
+        });
+      });
+
+      const dropzone = document.getElementById('dropzone-a');
+      dropzone.addEventListener('dragover', function (e) {
+        e.preventDefault();
+        dropzone.classList.add('dropzone-hover');
+      });
+      dropzone.addEventListener('dragleave', function () {
+        dropzone.classList.remove('dropzone-hover');
+      });
+      dropzone.addEventListener('drop', function (e) {
+        e.preventDefault();
+        dropzone.classList.remove('dropzone-hover');
+        const expDepose = parseInt(e.dataTransfer.getData('text/plain'), 10);
+        validerReponseGlisserA(q, expDepose, exposantCorrect, cartes, dropzone);
+      });
+    }
+
+    function validerReponseGlisserA(q, expDepose, exposantCorrect, cartes, dropzone) {
+      const correcte = (expDepose === exposantCorrect);
+      const valeurDeposee = q.valeurDepart * Math.pow(10, expDepose);
+
+      dropzone.textContent = formatNombre(valeurDeposee) + ' ' + q.uniteCible;
+      dropzone.classList.add(correcte ? 'dropzone-correct' : 'dropzone-incorrect');
+
+      cartes.forEach(function (c) {
+        c.setAttribute('draggable', 'false');
+        c.classList.add('carte-desactivee');
+      });
+
+      finaliserQuestion(
+        correcte,
+        formatNombre(q.valeurDepart) + ' ' + q.uniteDepart + ' = ? ' + q.uniteCible,
+        formatNombre(valeurDeposee) + ' ' + q.uniteCible,
+        formatNombre(q.valeurCible) + ' ' + q.uniteCible,
+        document.getElementById('feedback-zone')
+      );
+    }
+
+    // ===================== FORMAT "GLISSER-DEPOSER" — VARIANTE B =====================
+    // Section 4.3, variante B : la puissance de 10 est manquante dans
+    // l'équation, l'élève la glisse depuis une palette vers l'emplacement vide.
+
+    function renderGlisserVarianteB(q) {
+      const donnees = genererPropositionsExposant(q);
+      const exposantCorrect = donnees.exposantCorrect;
+      const propositions = donnees.propositions;
+
+      const container = document.getElementById('question-container');
+      container.innerHTML =
+        '<div class="question-glisser">' +
+        '  <p class="question-consigne">Glisse la bonne puissance de 10 dans l\'emplacement vide :</p>' +
+        '  <p class="question-equation">' +
+        formatNombre(q.valeurDepart) + ' ' + q.uniteDepart + ' = ' + formatNombre(q.valeurDepart) +
+        ' <span class="equation-dropzone" id="dropzone-b">?</span> ' + q.uniteCible +
+        '  </p>' +
+        '  <div class="palette-cartes" id="palette-cartes">' +
+        propositions.map(function (exp, idx) {
+          return '<div class="carte-glisser" draggable="true" data-exp="' + exp + '" id="carte-b-' + idx + '">' +
+            formatPuissanceDix(exp) + '</div>';
+        }).join('') +
+        '  </div>' +
+        '  <div id="feedback-zone"></div>' +
+        '</div>';
+
+      const cartes = container.querySelectorAll('.carte-glisser');
+      cartes.forEach(function (carte) {
+        carte.addEventListener('dragstart', function (e) {
+          e.dataTransfer.setData('text/plain', carte.dataset.exp);
+          e.dataTransfer.effectAllowed = 'move';
+        });
+      });
+
+      const dropzone = document.getElementById('dropzone-b');
+      dropzone.addEventListener('dragover', function (e) {
+        e.preventDefault();
+        dropzone.classList.add('dropzone-hover');
+      });
+      dropzone.addEventListener('dragleave', function () {
+        dropzone.classList.remove('dropzone-hover');
+      });
+      dropzone.addEventListener('drop', function (e) {
+        e.preventDefault();
+        dropzone.classList.remove('dropzone-hover');
+        const expDepose = parseInt(e.dataTransfer.getData('text/plain'), 10);
+        validerReponseGlisserB(q, expDepose, exposantCorrect, cartes, dropzone);
+      });
+    }
+
+    function validerReponseGlisserB(q, expDepose, exposantCorrect, cartes, dropzone) {
+      const correcte = (expDepose === exposantCorrect);
+
+      dropzone.textContent = formatPuissanceDix(expDepose);
+      dropzone.classList.add(correcte ? 'dropzone-correct' : 'dropzone-incorrect');
+
+      cartes.forEach(function (c) {
+        c.setAttribute('draggable', 'false');
+        c.classList.add('carte-desactivee');
+      });
+
+      const exempleTexte = formatNombre(q.valeurDepart) + ' ' + q.uniteDepart +
+        ' = ' + formatNombre(q.valeurDepart) + ' ' + formatPuissanceDix(exposantCorrect) + ' ' + q.uniteCible +
+        ' = ' + formatNombre(q.valeurCible) + ' ' + q.uniteCible;
+
+      finaliserQuestion(
+        correcte,
+        formatNombre(q.valeurDepart) + ' ' + q.uniteDepart + ' = ' + formatNombre(q.valeurDepart) + ' ... ' + q.uniteCible,
+        formatPuissanceDix(expDepose),
+        formatPuissanceDix(exposantCorrect),
+        document.getElementById('feedback-zone'),
+        exempleTexte
+      );
+    }
+
+    // ===================== FORMAT "GLISSER-DEPOSER" — VARIANTE C =====================
+    // Section 4.3, variante C : même principe que la variante B, mais
+    // l'emplacement vide porte sur le préfixe lui-même (ex. "1500 g = 1,5 ▢g").
+    // Leurres proches volontaires (m/M, c/µ) pour travailler la distinction
+    // visuelle et le sens des symboles, comme demandé dans la fiche outil.
+
+    const PAIRES_PREFIXES_CONFUSIBLES = { m: 'M', M: 'm', c: 'µ', µ: 'c' };
+
+    // Le préfixe "centi" n'est utilisé en pratique que pour le centimètre
+    // (et plus tard le centilitre) : on l'exclut des leurres pour toutes
+    // les autres grandeurs, pour ne jamais montrer d'unité inexistante
+    // (ex. "cA", "cJ") même comme mauvaise réponse.
+    function centiAutorisePour(grandeur) {
+      return grandeur.symbole === 'm';
+    }
+
+    function genererPropositionsPrefixe(prefixeCorrect, grandeur) {
+      const centiAutorise = centiAutorisePour(grandeur);
+      const symbolesRestants = PREFIXES
+        .map(function (p) { return p.symbole; })
+        .filter(function (s) { return s !== prefixeCorrect.symbole && (s !== 'c' || centiAutorise); });
+
+      const propositions = [prefixeCorrect.symbole];
+
+      const confusible = PAIRES_PREFIXES_CONFUSIBLES[prefixeCorrect.symbole];
+      if (confusible !== undefined && !propositions.includes(confusible) && (confusible !== 'c' || centiAutorise)) {
+        propositions.push(confusible);
+      }
+
+      while (propositions.length < 4) {
+        const candidat = choixAleatoire(symbolesRestants);
+        if (!propositions.includes(candidat)) propositions.push(candidat);
+      }
+
+      return melanger(propositions);
+    }
+
+    function renderGlisserVarianteC(q) {
+      const propositions = genererPropositionsPrefixe(q.prefixeCible, q.grandeur);
+
+      const container = document.getElementById('question-container');
+      container.innerHTML =
+        '<div class="question-glisser">' +
+        '  <p class="question-consigne">Glisse le bon préfixe (multiple ou sous-multiple) dans l\'emplacement vide :</p>' +
+        '  <p class="question-equation">' +
+        formatNombre(q.valeurDepart) + ' ' + q.uniteDepart + ' = ' + formatNombre(q.valeurCible) +
+        ' <span class="equation-dropzone" id="dropzone-c">?</span>' +
+        '  </p>' +
+        '  <div class="palette-cartes" id="palette-cartes">' +
+        propositions.map(function (symb, idx) {
+          return '<div class="carte-glisser" draggable="true" data-symbole="' + symb + '" id="carte-c-' + idx + '">' +
+            symb + q.grandeur.symbole + '</div>';
+        }).join('') +
+        '  </div>' +
+        '  <div id="feedback-zone"></div>' +
+        '</div>';
+
+      const cartes = container.querySelectorAll('.carte-glisser');
+      cartes.forEach(function (carte) {
+        carte.addEventListener('dragstart', function (e) {
+          e.dataTransfer.setData('text/plain', carte.dataset.symbole);
+          e.dataTransfer.effectAllowed = 'move';
+        });
+      });
+
+      const dropzone = document.getElementById('dropzone-c');
+      dropzone.addEventListener('dragover', function (e) {
+        e.preventDefault();
+        dropzone.classList.add('dropzone-hover');
+      });
+      dropzone.addEventListener('dragleave', function () {
+        dropzone.classList.remove('dropzone-hover');
+      });
+      dropzone.addEventListener('drop', function (e) {
+        e.preventDefault();
+        dropzone.classList.remove('dropzone-hover');
+        const symboleDepose = e.dataTransfer.getData('text/plain');
+        validerReponseGlisserC(q, symboleDepose, cartes, dropzone);
+      });
+    }
+
+    function validerReponseGlisserC(q, symboleDepose, cartes, dropzone) {
+      const correcte = (symboleDepose === q.prefixeCible.symbole);
+
+      dropzone.textContent = symboleDepose + q.grandeur.symbole;
+      dropzone.classList.add(correcte ? 'dropzone-correct' : 'dropzone-incorrect');
+
+      cartes.forEach(function (c) {
+        c.setAttribute('draggable', 'false');
+        c.classList.add('carte-desactivee');
+      });
+
+      finaliserQuestion(
+        correcte,
+        formatNombre(q.valeurDepart) + ' ' + q.uniteDepart + ' = ' + formatNombre(q.valeurCible) + ' ...',
+        symboleDepose + q.grandeur.symbole,
+        q.prefixeCible.symbole + q.grandeur.symbole,
+        document.getElementById('feedback-zone')
+      );
+    }
+
+    // ===================== FORMAT "GLISSER-DEPOSER" — VARIANTE D (mix) =====================
+    // Section 4.3, variante D : combine deux éléments à compléter par
+    // glisser-déposer simultanément, chacun avec sa propre zone de dépôt et
+    // sa propre palette. Réservée aux blocs 2 à 4 (jamais au bloc 1) une
+    // fois les mécaniques A/B/C maîtrisées séparément. Validation globale :
+    // le résultat (correct/incorrect) n'est déterminé qu'une fois les DEUX
+    // emplacements remplis.
+    //
+    // Sous-variante D1 (valeur + puissance de 10) : utilisable partout où
+    // B fonctionne (blocs 2, 3 et 4).
+    // Sous-variante D2 (valeur + préfixe) : seulement là où C fonctionne
+    // (bloc 2, préfixe isolable via la table PREFIXES).
+
+    function genererLeurresMantisse(valeurCorrecte) {
+      const candidatsBruts = [valeurCorrecte * 10, valeurCorrecte / 10, valeurCorrecte * 2, valeurCorrecte / 2];
+      const propositions = [valeurCorrecte];
+      candidatsBruts.forEach(function (c) {
+        if (propositions.length >= 4) return;
+        const dejaPresent = propositions.some(function (p) { return Math.abs(p - c) < 1e-9; });
+        if (!dejaPresent) propositions.push(c);
+      });
+      return melanger(propositions);
+    }
+
+    function renderGlisserVarianteD(q) {
+      if (q.sousVarianteD === 'D2') {
+        renderGlisserVarianteD2(q);
+      } else {
+        renderGlisserVarianteD1(q);
+      }
+    }
+
+    function renderGlisserVarianteD1(q) {
+      const donneesExposant = genererPropositionsExposant(q);
+      const exposantCorrect = donneesExposant.exposantCorrect;
+      const propositionsExposant = donneesExposant.propositions;
+      const propositionsMantisse = genererLeurresMantisse(q.valeurDepart);
+
+      const container = document.getElementById('question-container');
+      container.innerHTML =
+        '<div class="question-glisser">' +
+        '  <p class="question-consigne">Glisse la bonne valeur ET la bonne puissance de 10 dans les emplacements vides :</p>' +
+        '  <p class="question-equation">' +
+        formatNombre(q.valeurDepart) + ' ' + q.uniteDepart + ' = ' +
+        '<span class="equation-dropzone" id="dropzone-d1-valeur">?</span>' +
+        ' × 10<span class="equation-dropzone" id="dropzone-d1-exposant">?</span> ' + q.uniteCible +
+        '  </p>' +
+        '  <p class="palette-titre">Valeurs</p>' +
+        '  <div class="palette-cartes" id="palette-d1-valeurs">' +
+        propositionsMantisse.map(function (v, idx) {
+          return '<div class="carte-glisser" draggable="true" data-valeur="' + v + '" id="carte-d1-valeur-' + idx + '">' + formatNombre(v) + '</div>';
+        }).join('') +
+        '  </div>' +
+        '  <p class="palette-titre">Puissances de 10</p>' +
+        '  <div class="palette-cartes" id="palette-d1-exposants">' +
+        propositionsExposant.map(function (exp, idx) {
+          return '<div class="carte-glisser" draggable="true" data-exp="' + exp + '" id="carte-d1-exp-' + idx + '">' + formatPuissanceDix(exp) + '</div>';
+        }).join('') +
+        '  </div>' +
+        '  <div id="feedback-zone"></div>' +
+        '</div>';
+
+      const cartesValeurs = document.querySelectorAll('#palette-d1-valeurs .carte-glisser');
+      const cartesExposants = document.querySelectorAll('#palette-d1-exposants .carte-glisser');
+      cartesValeurs.forEach(function (carte) {
+        carte.addEventListener('dragstart', function (e) {
+          e.dataTransfer.setData('text/plain', carte.dataset.valeur);
+        });
+      });
+      cartesExposants.forEach(function (carte) {
+        carte.addEventListener('dragstart', function (e) {
+          e.dataTransfer.setData('text/plain', carte.dataset.exp);
+        });
+      });
+
+      const etat = { valeurRemplie: false, exposantRempli: false, valeurCorrecte: false, exposantCorrecte: false };
+
+      function verifierFin() {
+        if (!etat.valeurRemplie || !etat.exposantRempli) return;
+        const correcte = etat.valeurCorrecte && etat.exposantCorrecte;
+        finaliserQuestion(
+          correcte,
+          formatNombre(q.valeurDepart) + ' ' + q.uniteDepart + ' = ... × 10... ' + q.uniteCible,
+          etat.texteValeur + ' × 10' + etat.texteExposant,
+          formatNombre(q.valeurDepart) + ' ' + formatPuissanceDix(exposantCorrect),
+          document.getElementById('feedback-zone')
+        );
+      }
+
+      const dropzoneValeur = document.getElementById('dropzone-d1-valeur');
+      dropzoneValeur.addEventListener('dragover', function (e) {
+        e.preventDefault();
+        dropzoneValeur.classList.add('dropzone-hover');
+      });
+      dropzoneValeur.addEventListener('dragleave', function () {
+        dropzoneValeur.classList.remove('dropzone-hover');
+      });
+      dropzoneValeur.addEventListener('drop', function (e) {
+        e.preventDefault();
+        dropzoneValeur.classList.remove('dropzone-hover');
+        if (etat.valeurRemplie) return;
+        const valeurDeposee = parseFloat(e.dataTransfer.getData('text/plain'));
+        const correcte = Math.abs(valeurDeposee - q.valeurDepart) < 1e-9 * Math.max(1, Math.abs(q.valeurDepart));
+        dropzoneValeur.textContent = formatNombre(valeurDeposee);
+        dropzoneValeur.classList.add(correcte ? 'dropzone-correct' : 'dropzone-incorrect');
+
+        if (correcte) {
+          cartesValeurs.forEach(function (c) { c.setAttribute('draggable', 'false'); c.classList.add('carte-desactivee'); });
+          etat.valeurRemplie = true;
+          etat.valeurCorrecte = true;
+          etat.texteValeur = formatNombre(valeurDeposee);
+          verifierFin();
+        } else {
+          // Zone "valeur" : cette case teste surtout une lecture attentive
+          // (redonner le nombre de départ), pas la conversion elle-même —
+          // on autorise de nouveaux essais plutôt que de bloquer aussitôt.
+          setTimeout(function () {
+            dropzoneValeur.textContent = '?';
+            dropzoneValeur.classList.remove('dropzone-incorrect');
+          }, 800);
+        }
+      });
+
+      const dropzoneExposant = document.getElementById('dropzone-d1-exposant');
+      dropzoneExposant.addEventListener('dragover', function (e) {
+        e.preventDefault();
+        dropzoneExposant.classList.add('dropzone-hover');
+      });
+      dropzoneExposant.addEventListener('dragleave', function () {
+        dropzoneExposant.classList.remove('dropzone-hover');
+      });
+      dropzoneExposant.addEventListener('drop', function (e) {
+        e.preventDefault();
+        dropzoneExposant.classList.remove('dropzone-hover');
+        if (etat.exposantRempli) return;
+        const expDepose = parseInt(e.dataTransfer.getData('text/plain'), 10);
+        const correcte = (expDepose === exposantCorrect);
+        dropzoneExposant.textContent = versExposantUnicode(expDepose);
+        dropzoneExposant.classList.add(correcte ? 'dropzone-correct' : 'dropzone-incorrect');
+        cartesExposants.forEach(function (c) { c.setAttribute('draggable', 'false'); c.classList.add('carte-desactivee'); });
+        etat.exposantRempli = true;
+        etat.exposantCorrecte = correcte;
+        etat.texteExposant = versExposantUnicode(expDepose);
+        verifierFin();
+      });
+    }
+
+    function renderGlisserVarianteD2(q) {
+      const propositionsPrefixe = genererPropositionsPrefixe(q.prefixeCible, q.grandeur);
+      const donneesExposant = genererPropositionsExposant(q);
+      const propositionsValeur = melanger(donneesExposant.propositions.map(function (exp) {
+        return q.valeurDepart * Math.pow(10, exp);
+      }));
+
+      const container = document.getElementById('question-container');
+      container.innerHTML =
+        '<div class="question-glisser">' +
+        '  <p class="question-consigne">Glisse la bonne valeur ET le bon préfixe dans les emplacements vides :</p>' +
+        '  <p class="question-equation">' +
+        formatNombre(q.valeurDepart) + ' ' + q.uniteDepart + ' = ' +
+        '<span class="equation-dropzone" id="dropzone-d2-valeur">?</span> ' +
+        '<span class="equation-dropzone" id="dropzone-d2-prefixe">?</span>' +
+        '  </p>' +
+        '  <p class="palette-titre">Valeurs</p>' +
+        '  <div class="palette-cartes" id="palette-d2-valeurs">' +
+        propositionsValeur.map(function (v, idx) {
+          return '<div class="carte-glisser" draggable="true" data-valeur="' + v + '" id="carte-d2-valeur-' + idx + '">' + formatNombre(v) + '</div>';
+        }).join('') +
+        '  </div>' +
+        '  <p class="palette-titre">Préfixes</p>' +
+        '  <div class="palette-cartes" id="palette-d2-prefixes">' +
+        propositionsPrefixe.map(function (symb, idx) {
+          return '<div class="carte-glisser" draggable="true" data-symbole="' + symb + '" id="carte-d2-prefixe-' + idx + '">' + symb + q.grandeur.symbole + '</div>';
+        }).join('') +
+        '  </div>' +
+        '  <div id="feedback-zone"></div>' +
+        '</div>';
+
+      const cartesValeurs = document.querySelectorAll('#palette-d2-valeurs .carte-glisser');
+      const cartesPrefixes = document.querySelectorAll('#palette-d2-prefixes .carte-glisser');
+      cartesValeurs.forEach(function (carte) {
+        carte.addEventListener('dragstart', function (e) { e.dataTransfer.setData('text/plain', carte.dataset.valeur); });
+      });
+      cartesPrefixes.forEach(function (carte) {
+        carte.addEventListener('dragstart', function (e) { e.dataTransfer.setData('text/plain', carte.dataset.symbole); });
+      });
+
+      const etat = { valeurRemplie: false, prefixeRempli: false, valeurCorrecte: false, prefixeCorrecte: false };
+
+      function verifierFin() {
+        if (!etat.valeurRemplie || !etat.prefixeRempli) return;
+        const correcte = etat.valeurCorrecte && etat.prefixeCorrecte;
+        finaliserQuestion(
+          correcte,
+          formatNombre(q.valeurDepart) + ' ' + q.uniteDepart + ' = ... ...',
+          etat.texteValeur + ' ' + etat.textePrefixe,
+          formatNombre(q.valeurCible) + ' ' + q.prefixeCible.symbole + q.grandeur.symbole,
+          document.getElementById('feedback-zone')
+        );
+      }
+
+      const dropzoneValeur = document.getElementById('dropzone-d2-valeur');
+      dropzoneValeur.addEventListener('dragover', function (e) {
+        e.preventDefault();
+        dropzoneValeur.classList.add('dropzone-hover');
+      });
+      dropzoneValeur.addEventListener('dragleave', function () {
+        dropzoneValeur.classList.remove('dropzone-hover');
+      });
+      dropzoneValeur.addEventListener('drop', function (e) {
+        e.preventDefault();
+        dropzoneValeur.classList.remove('dropzone-hover');
+        if (etat.valeurRemplie) return;
+        const valeurDeposee = parseFloat(e.dataTransfer.getData('text/plain'));
+        const attendu = q.valeurCible;
+        const correcte = Math.abs(valeurDeposee - attendu) <= EPSILON + Math.abs(attendu) * TOLERANCE_RELATIVE;
+        dropzoneValeur.textContent = formatNombre(valeurDeposee);
+        dropzoneValeur.classList.add(correcte ? 'dropzone-correct' : 'dropzone-incorrect');
+        cartesValeurs.forEach(function (c) { c.setAttribute('draggable', 'false'); c.classList.add('carte-desactivee'); });
+        etat.valeurRemplie = true;
+        etat.valeurCorrecte = correcte;
+        etat.texteValeur = formatNombre(valeurDeposee);
+        verifierFin();
+      });
+
+      const dropzonePrefixe = document.getElementById('dropzone-d2-prefixe');
+      dropzonePrefixe.addEventListener('dragover', function (e) {
+        e.preventDefault();
+        dropzonePrefixe.classList.add('dropzone-hover');
+      });
+      dropzonePrefixe.addEventListener('dragleave', function () {
+        dropzonePrefixe.classList.remove('dropzone-hover');
+      });
+      dropzonePrefixe.addEventListener('drop', function (e) {
+        e.preventDefault();
+        dropzonePrefixe.classList.remove('dropzone-hover');
+        if (etat.prefixeRempli) return;
+        const symboleDepose = e.dataTransfer.getData('text/plain');
+        const correcte = (symboleDepose === q.prefixeCible.symbole);
+        dropzonePrefixe.textContent = symboleDepose + q.grandeur.symbole;
+        dropzonePrefixe.classList.add(correcte ? 'dropzone-correct' : 'dropzone-incorrect');
+        cartesPrefixes.forEach(function (c) { c.setAttribute('draggable', 'false'); c.classList.add('carte-desactivee'); });
+        etat.prefixeRempli = true;
+        etat.prefixeCorrecte = correcte;
+        etat.textePrefixe = symboleDepose + q.grandeur.symbole;
+        verifierFin();
+      });
+    }
+
+    // ===================== BRANCHEMENT DES BOUTONS/CARTES =====================
+
+    document.getElementById('block-card-1').addEventListener('click', function () {
+      demarrerSerie(1);
+    });
+
+    document.getElementById('game-back-btn').addEventListener('click', function () {
+      afficherEcran('home');
+    });
+
+    document.getElementById('results-restart-btn').addEventListener('click', function () {
+      demarrerSerie(etatJeu.blocActif);
+    });
+
+    document.getElementById('results-home-btn').addEventListener('click', function () {
+      afficherEcran('home');
+    });
+
+    document.getElementById('results-next-btn').addEventListener('click', function () {
+      demarrerSerie(etatJeu.blocActif + 1);
+    });
+
+    // ===================== GUIDE D'UTILISATION =====================
+
+    function ouvrirGuide() {
+      document.getElementById('guide-overlay').hidden = false;
+    }
+
+    function fermerGuide() {
+      document.getElementById('guide-overlay').hidden = true;
+    }
+
+    document.getElementById('guide-ouvrir-btn').addEventListener('click', ouvrirGuide);
+    document.getElementById('guide-fermer-btn').addEventListener('click', fermerGuide);
+
+    // Remise à zéro de la progression (meilleurs scores, étoiles, blocs
+    // débloqués) : utile pour un nouvel élève sur le même poste. Confirmation
+    // native avant d'agir, action irréversible. N'écrit pas dans le
+    // localStorage en mode test (?debloquertout), comme sauvegarderProgression().
+    document.getElementById('guide-reinitialiser-btn').addEventListener('click', function () {
+      const confirmation = window.confirm(
+        'Réinitialiser toute la progression (meilleurs scores, étoiles, blocs débloqués) ? Cette action est irréversible.'
+      );
+      if (!confirmation) return;
+
+      progression = progressionParDefaut();
+      sauvegarderProgression();
+      rafraichirAccueil();
+
+      const messageConfirmation = document.getElementById('guide-reinitialiser-confirmation');
+      messageConfirmation.hidden = false;
+      setTimeout(function () { messageConfirmation.hidden = true; }, 3000);
+    });
+
+    document.getElementById('guide-overlay').addEventListener('click', function (e) {
+      if (e.target.id === 'guide-overlay') fermerGuide();
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && !document.getElementById('guide-overlay').hidden) {
+        fermerGuide();
+      }
+    });
+
+    rafraichirAccueil();
+
+  </script>
+
+</body>
+</html>
