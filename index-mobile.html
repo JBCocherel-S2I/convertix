@@ -1087,10 +1087,10 @@
     // par grandeur (section 5.2) pour éviter les combinaisons absurdes
     // (ex. "gigaseconde"). Liste à affiner avec l'enseignant (section 10).
     const GRANDEURS_BASE = [
-      // Préfixes "d" et "c" retirés du gramme : décigramme/centigramme ne
-      // sont pas utilisés en pratique technologique ou scientifique
-      // courante (contrairement à cm pour le mètre, conservé lui).
-      { symbole: 'g',  nom: 'gramme',   prefixesUsuels: ['G', 'M', 'k', '', 'm', 'µ', 'n'] },
+      // Le gramme n'utilise que g, kg, mg et T (tonne, affichée à la place
+      // de Mg) : les autres préfixes (G, µ, n, d, c) ne sont pas des unités
+      // de masse usuelles en pratique technologique ou scientifique courante.
+      { symbole: 'g',  nom: 'gramme',   prefixesUsuels: ['M', 'k', '', 'm'] },
       { symbole: 's',  nom: 'seconde',  prefixesUsuels: ['', 'm', 'µ', 'n'] },
       // "G" et "M" retirés du mètre : gigamètre/mégamètre ne sont pas des
       // unités usuelles en STI2D, contrairement à km, dm, cm, mm, µm, nm.
@@ -2655,30 +2655,37 @@
 
     const PAIRES_PREFIXES_CONFUSIBLES = { m: 'M', M: 'm', c: 'µ', µ: 'c' };
 
-    // Le préfixe "centi" n'est utilisé en pratique que pour le centimètre
-    // (et plus tard le centilitre) : on l'exclut des leurres pour toutes
-    // les autres grandeurs, pour ne jamais montrer d'unité inexistante
-    // (ex. "cA", "cJ") même comme mauvaise réponse.
-    function centiAutorisePour(grandeur) {
-      return grandeur.symbole === 'm';
-    }
-
+    // Les leurres sont tirés exclusivement parmi les préfixes usuels de la
+    // grandeur (grandeur.prefixesUsuels) : jamais d'unité inexistante ou
+    // non pertinente en pratique (ex. "µg", "dg", "cA") même comme mauvaise
+    // réponse. Repli sur la table complète des préfixes seulement si la
+    // grandeur n'a pas assez de préfixes usuels distincts pour en proposer 4
+    // (ex. Pa, N).
     function genererPropositionsPrefixe(prefixeCorrect, grandeur) {
-      const centiAutorise = centiAutorisePour(grandeur);
-      const symbolesRestants = PREFIXES
-        .map(function (p) { return p.symbole; })
-        .filter(function (s) { return s !== prefixeCorrect.symbole && (s !== 'c' || centiAutorise); });
+      const poolUsuels = grandeur.prefixesUsuels.filter(function (s) { return s !== prefixeCorrect.symbole; });
 
       const propositions = [prefixeCorrect.symbole];
 
       const confusible = PAIRES_PREFIXES_CONFUSIBLES[prefixeCorrect.symbole];
-      if (confusible !== undefined && !propositions.includes(confusible) && (confusible !== 'c' || centiAutorise)) {
+      if (confusible !== undefined && !propositions.includes(confusible) && grandeur.prefixesUsuels.includes(confusible)) {
         propositions.push(confusible);
       }
 
-      while (propositions.length < 4) {
-        const candidat = choixAleatoire(symbolesRestants);
+      while (propositions.length < 4 && poolUsuels.length > 0) {
+        const idx = Math.floor(Math.random() * poolUsuels.length);
+        const candidat = poolUsuels.splice(idx, 1)[0];
         if (!propositions.includes(candidat)) propositions.push(candidat);
+      }
+
+      if (propositions.length < 4) {
+        const centiAutorise = grandeur.symbole === 'm';
+        const symbolesRestants = PREFIXES
+          .map(function (p) { return p.symbole; })
+          .filter(function (s) { return !propositions.includes(s) && (s !== 'c' || centiAutorise); });
+        while (propositions.length < 4) {
+          const candidat = choixAleatoire(symbolesRestants);
+          if (!propositions.includes(candidat)) propositions.push(candidat);
+        }
       }
 
       return melanger(propositions);
