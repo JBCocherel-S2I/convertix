@@ -386,6 +386,25 @@
     opacity: 0.7;
   }
 
+  /* Le clavier numérique tactile (inputmode="numeric") n'affiche pas de
+     signe "-" sur la plupart des mobiles : ce bouton bascule le signe de
+     l'exposant sans dépendre du clavier du système. */
+  .btn-signe-exposant {
+    font-family: Verdana, Geneva, sans-serif;
+    font-size: 1.1rem;
+    min-width: 44px;
+    min-height: 44px;
+    border-radius: 10px;
+    border: 1px solid var(--border-marquee);
+    background-color: var(--bg-1);
+    color: var(--text-1);
+    cursor: pointer;
+  }
+
+  .btn-signe-exposant:disabled {
+    opacity: 0.7;
+  }
+
   .separateur-x10 {
     font-size: 1.1rem;
     color: var(--text-1);
@@ -983,9 +1002,9 @@
 
         <h3>Les formats de question</h3>
         <ul>
-          <li><strong>Conversion directe</strong> : tape la réponse dans le champ. Si le résultat comporte beaucoup de zéros, deux champs séparés apparaissent ("mantisse × 10 exposant") pour éviter de les compter un par un.</li>
+          <li><strong>Conversion directe</strong> : tape la réponse dans le champ. Si le résultat comporte beaucoup de zéros, deux champs séparés apparaissent ("mantisse × 10 exposant") pour éviter de les compter un par un ; utilise le bouton "±" pour un exposant négatif.</li>
           <li><strong>QCM</strong> : choisis la bonne puissance de 10 (ex. × 10³) parmi 4 propositions.</li>
-          <li><strong>Glisser-déposer</strong> : touche la bonne carte (une valeur, une puissance de 10, un préfixe, ou une combinaison des deux) puis touche la zone en pointillés pour l'y placer. La réponse est validée dès que la carte est posée.</li>
+          <li><strong>Glisser-déposer</strong> : touche la bonne carte (une valeur, une puissance de 10, ou un préfixe) puis touche la zone en pointillés pour l'y placer. La réponse est validée dès que la carte est posée.</li>
         </ul>
 
         <h3>Score et étoiles</h3>
@@ -1964,16 +1983,19 @@
       { type: 'glisser', poids: 30 }
     ];
 
-    // La variante D (mix) est réservée aux blocs 2 à 4 une fois les
-    // mécaniques individuelles A/B/C bien maîtrisées séparément dans le
-    // bloc 1 (section 4.3). La variante C (glisser le préfixe) ne s'applique
-    // ni au bloc 3 (surfaces/volumes) ni au bloc 4 (grandeurs composées) :
-    // ces unités ne se décomposent pas en un simple préfixe isolable comme
-    // le fait la table PREFIXES.
+    // La variante D (mix, deux emplacements à remplir simultanément :
+    // valeur + puissance de 10, ou valeur + préfixe) est retirée du tirage
+    // sur cette version mobile : en tactile (tap-to-place plutôt que
+    // glisser-déposer souris), remplir deux zones à la fois s'est révélé
+    // trop complexe. Seules les variantes à un seul emplacement (A, B, C)
+    // sont proposées ici ; la version PC conserve la variante D.
+    // La variante C (glisser le préfixe) ne s'applique ni au bloc 3
+    // (surfaces/volumes) ni au bloc 4 (grandeurs composées) : ces unités ne
+    // se décomposent pas en un simple préfixe isolable comme le fait la
+    // table PREFIXES.
     function variantesGlisserPourBloc(blocNum) {
-      if (blocNum === 1) return ['A', 'B', 'C'];
-      if (blocNum === 3 || blocNum === 4) return ['A', 'B', 'D'];
-      return ['A', 'B', 'C', 'D'];
+      if (blocNum === 3 || blocNum === 4) return ['A', 'B'];
+      return ['A', 'B', 'C'];
     }
 
     function tirerFormatExercice() {
@@ -1996,12 +2018,6 @@
         q.format = q.formatImpose || tirerFormatExercice();
         if (q.format === 'glisser') {
           q.variante = choixAleatoire(variantesGlisserPourBloc(blocNum));
-          if (q.variante === 'D') {
-            // Sous-variante "préfixe + valeur" seulement là où un vrai
-            // préfixe isolable existe (bloc 2) ; sinon "valeur + puissance
-            // de 10", utilisable partout (blocs 2 à 4).
-            q.sousVarianteD = (blocNum === 2) ? choixAleatoire(['D1', 'D2']) : 'D1';
-          }
         }
         etatJeu.questions.push(q);
       }
@@ -2045,7 +2061,8 @@
       const zoneSaisie = saisieScientifique
         ? '    <input type="text" inputmode="decimal" id="reponse-mantisse" autocomplete="off" placeholder="mantisse" class="input-mantisse">' +
           '    <span class="separateur-x10">× 10</span>' +
-          '    <input type="text" inputmode="numeric" id="reponse-exposant" autocomplete="off" placeholder="exp." class="input-exposant">'
+          '    <input type="text" inputmode="numeric" id="reponse-exposant" autocomplete="off" placeholder="exp." class="input-exposant">' +
+          '    <button type="button" id="toggle-signe-exposant" class="btn-signe-exposant" aria-label="Changer le signe de l\'exposant">±</button>'
         : '    <input type="text" inputmode="decimal" id="reponse-input" autocomplete="off" placeholder="Ta réponse">';
 
       container.innerHTML =
@@ -2061,6 +2078,16 @@
         '</div>';
 
       document.getElementById('valider-btn').addEventListener('click', validerReponseDirecte);
+
+      if (saisieScientifique) {
+        const champExposant = document.getElementById('reponse-exposant');
+        document.getElementById('toggle-signe-exposant').addEventListener('click', function () {
+          champExposant.value = champExposant.value.startsWith('-')
+            ? champExposant.value.slice(1)
+            : '-' + champExposant.value;
+          champExposant.focus();
+        });
+      }
 
       const nomChampUnique = 'reponse-' + etatJeu.indexActuel + '-' + Date.now();
       const champs = saisieScientifique
@@ -2097,6 +2124,8 @@
           : champMantisse.value + ' ' + formatPuissanceDix(exposant);
         champMantisse.disabled = true;
         champExposant.disabled = true;
+        const toggleSigne = document.getElementById('toggle-signe-exposant');
+        if (toggleSigne) toggleSigne.disabled = true;
       } else {
         const input = document.getElementById('reponse-input');
         const brut = input.value.trim().replace(',', '.');
