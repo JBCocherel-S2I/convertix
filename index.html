@@ -939,7 +939,7 @@
 
       <div class="guide-contenu">
         <h3>Le principe</h3>
-        <p>Commence par le bloc 1 (toujours débloqué) : chaque série propose 20 questions de conversion générées aléatoirement. Un bloc supplémentaire se débloque dès que le précédent est réussi avec au moins ★★★★ (4 étoiles sur 5, soit 16/20 ou plus).</p>
+        <p>Commence par le bloc 1 (toujours débloqué) : chaque série propose 20 questions de conversion générées aléatoirement. Un bloc supplémentaire se débloque dès que le précédent est réussi avec au moins ★★★★ (4 étoiles sur 5, soit 16/20 ou plus). Si tu quittes une série en cours via "Retour à l'accueil", ta progression (question atteinte et score) est mémorisée : reclique sur le même bloc pour reprendre exactement où tu t'étais arrêté.</p>
 
         <h3>Les formats de question</h3>
         <ul>
@@ -1968,6 +1968,7 @@
       etatJeu.indexActuel = 0;
       etatJeu.score = 0;
       etatJeu.reponsesDonnees = [];
+      sauvegarderSessionEnCours();
 
       afficherEcran('game');
       afficherQuestionCourante();
@@ -2266,6 +2267,7 @@
 
     function passerQuestionSuivante() {
       etatJeu.indexActuel++;
+      sauvegarderSessionEnCours();
       if (etatJeu.indexActuel < etatJeu.questions.length) {
         afficherQuestionCourante();
       } else {
@@ -2285,6 +2287,60 @@
     // lisible pour l'élève, cohérent avec l'affichage ★.
     const SEUIL_ETOILES_DEBLOCAGE = 4;
     const CLE_STOCKAGE_PROGRESSION = 'unites-puissances-progression';
+
+    // Série en cours (question atteinte, score, réponses déjà données) :
+    // sauvegardée en continu pour que "Retour à l'accueil" en plein milieu
+    // d'une série ne fasse plus tout perdre — la reprise se fait à la
+    // question suivante, pas depuis le début.
+    const CLE_STOCKAGE_SESSION = 'unites-puissances-session-encours';
+
+    function sauvegarderSessionEnCours() {
+      try {
+        localStorage.setItem(CLE_STOCKAGE_SESSION, JSON.stringify({
+          blocActif: etatJeu.blocActif,
+          questions: etatJeu.questions,
+          indexActuel: etatJeu.indexActuel,
+          score: etatJeu.score,
+          reponsesDonnees: etatJeu.reponsesDonnees
+        }));
+      } catch (e) {
+        // stockage indisponible : la reprise ne sera pas proposée
+      }
+    }
+
+    function chargerSessionEnCours() {
+      try {
+        const brut = localStorage.getItem(CLE_STOCKAGE_SESSION);
+        return brut ? JSON.parse(brut) : null;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function effacerSessionEnCours() {
+      try {
+        localStorage.removeItem(CLE_STOCKAGE_SESSION);
+      } catch (e) {
+        // rien à faire : pas de session à effacer si le stockage est indisponible
+      }
+    }
+
+    // Reprend la série en cours si elle correspond au bloc demandé et n'est
+    // pas terminée, sinon démarre une série neuve (comportement inchangé).
+    function demarrerOuReprendreSerie(blocNum) {
+      const session = chargerSessionEnCours();
+      if (session && session.blocActif === blocNum && session.indexActuel < session.questions.length) {
+        etatJeu.blocActif = session.blocActif;
+        etatJeu.questions = session.questions;
+        etatJeu.indexActuel = session.indexActuel;
+        etatJeu.score = session.score;
+        etatJeu.reponsesDonnees = session.reponsesDonnees;
+        afficherEcran('game');
+        afficherQuestionCourante();
+      } else {
+        demarrerSerie(blocNum);
+      }
+    }
 
     const NB_ETOILES_MAX = 5;
 
@@ -2351,9 +2407,14 @@
       if (!texteScore || !texteEtoiles) return;
 
       const infos = progression[n];
-      texteScore.textContent = (infos.meilleurScore === null)
-        ? 'Pas encore joué'
-        : 'Meilleur score : ' + infos.meilleurScore + ' / 20';
+      const session = chargerSessionEnCours();
+      const serieEnCours = session && session.blocActif === n && session.indexActuel < session.questions.length;
+
+      texteScore.textContent = serieEnCours
+        ? 'Série en cours (question ' + (session.indexActuel + 1) + ' / ' + session.questions.length + ', score ' + session.score + ') — touche pour reprendre'
+        : (infos.meilleurScore === null)
+          ? 'Pas encore joué'
+          : 'Meilleur score : ' + infos.meilleurScore + ' / 20';
       texteEtoiles.textContent = '★'.repeat(infos.etoiles) + '☆'.repeat(NB_ETOILES_MAX - infos.etoiles);
     }
 
@@ -2379,7 +2440,7 @@
       badge.classList.toggle('status-locked', !jouable);
 
       if (jouable && carte.dataset.clicBranche !== 'true') {
-        carte.addEventListener('click', function () { demarrerSerie(n); });
+        carte.addEventListener('click', function () { demarrerOuReprendreSerie(n); });
         carte.dataset.clicBranche = 'true';
       }
     }
@@ -2396,6 +2457,8 @@
     }
 
     function terminerSerie() {
+      effacerSessionEnCours();
+
       const blocActif = etatJeu.blocActif;
       const score = etatJeu.score;
       const etoilesObtenues = etoilesBareme(score);
@@ -2967,10 +3030,11 @@
     // ===================== BRANCHEMENT DES BOUTONS/CARTES =====================
 
     document.getElementById('block-card-1').addEventListener('click', function () {
-      demarrerSerie(1);
+      demarrerOuReprendreSerie(1);
     });
 
     document.getElementById('game-back-btn').addEventListener('click', function () {
+      rafraichirAccueil();
       afficherEcran('home');
     });
 
@@ -3011,6 +3075,7 @@
 
       progression = progressionParDefaut();
       sauvegarderProgression();
+      effacerSessionEnCours();
       rafraichirAccueil();
 
       const messageConfirmation = document.getElementById('guide-reinitialiser-confirmation');
